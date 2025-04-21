@@ -4,6 +4,9 @@ import {
   LoginWrapperStyled,
 } from "./loginstyle";
 
+
+import GoogleLogin from "./GoogleLogin";
+
 import { Input, Button, Modal } from "antd";
 import { useForm, Controller } from "react-hook-form";
 import { useCallback, useState } from "react";
@@ -71,6 +74,7 @@ const Login = () => {
       showErrorModal("Something went wrong. Please try again later.");
     }
   }, []);
+  
 
   return (
     <>
@@ -117,7 +121,7 @@ const Login = () => {
           <Button onClick={handleSubmit(onSubmit)} className="login-button">
             Login
           </Button>
-
+          <GoogleLogin/>
           <Button onClick={() => navigate("/signup")} className="text-button">
             Don’t have an account? Signup
           </Button>
