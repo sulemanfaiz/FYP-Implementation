@@ -1,18 +1,26 @@
 import {
-  FormInputWrapperStyled,
+  LeftSectionStyled,
+  RightSectionStyled,
+  SignupPageStyled,
   SignupContainerStyled,
-  SignupFormStyled,
+  FormInputWrapperStyled,
   SignupWrapperStyled,
 } from "./signupstyle";
 
-import { Input } from "antd";
+import { Input, Button } from "antd";
 import { useForm, Controller } from "react-hook-form";
-import { Button } from "antd";
 import { useCallback } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupFormSchema } from "../../schema/signupschema";
-import { Link, useNavigate } from "react-router-dom";
-import PageBanner from "../../components/pagebanner";
+import { useNavigate } from "react-router-dom";
+import { FaHouse } from "react-icons/fa6";
+import styled from "styled-components";
+
+const HouseIcon = styled(FaHouse)`
+  color: white;
+  font-size: 48px;
+  margin-bottom: 20px;
+`;
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -21,8 +29,6 @@ const SignUp = () => {
     control,
     formState: { isValid },
     handleSubmit,
-    setValue,
-    setError,
   } = useForm({
     defaultValues: {
       name: "",
@@ -35,11 +41,8 @@ const SignUp = () => {
   });
 
   const onSubmit = useCallback(async (values) => {
-    console.log("values", values);
-
     try {
-      const url = `http://localhost:8080/auth/signup`;
-      const response = await fetch(url, {
+      const response = await fetch(`http://localhost:8080/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -47,97 +50,114 @@ const SignUp = () => {
         body: JSON.stringify(values),
       });
       const result = await response.json();
-
-      const { success, message, error } = result;
+      const { success } = result;
       if (success) {
+        localStorage.setItem("token", result.jwtToken);
         navigate("/my-properties");
-      } else if (error) {
-        const details = error?.details[0].message;
-        console.log("error", details);
       }
     } catch (err) {
-      console.log("catch error", err);
+      console.log("Error", err);
     }
   }, []);
 
   return (
-    <SignupWrapperStyled>
-      <PageBanner
-        heading="Signup"
-        description="Access your dashboard, manage listings, and connect with potential tenants — all in one place."
-      />
+    <SignupPageStyled>
+      {/* Left Section */}
+      <LeftSectionStyled>
+        <img src="/Kiraya pa logo.png" alt="Logo" className="logo" />
+        <h1>Join Kiraya Pa</h1>
+        <p>Your property, your terms — rent effortlessly!</p>
+      </LeftSectionStyled>
 
-      <SignupContainerStyled>
-        <FormInputWrapperStyled>
-          <div className="form-row">
-            <div className="label">Name</div>
+      {/* Right Section */}
+      <RightSectionStyled>
+        <SignupWrapperStyled>
+          <h1 className="signup-heading">Sign Up</h1>
+          <p className="signup-description">
+            Create your account and manage your rental listings with ease.
+          </p>
 
-            <Controller
-              control={control}
-              name="name"
-              render={({ field }) => (
-                <Input {...field} placeholder="Name" className="input-field" />
-              )}
-            />
-          </div>
-        </FormInputWrapperStyled>
-
-        <FormInputWrapperStyled>
-          <div className="form-row">
-            <div className="label">Email</div>
-            <Controller
-              control={control}
-              name="email"
-              render={({ field }) => (
-                <Input {...field} placeholder="Email" className="input-field" />
-              )}
-            />
-          </div>
-        </FormInputWrapperStyled>
-
-        <FormInputWrapperStyled>
-          <div className="form-row">
-            <div className="label">Password</div>
-            <Controller
-              control={control}
-              name="password"
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  placeholder="Password"
-                  className="input-field"
+          <SignupContainerStyled>
+            <FormInputWrapperStyled>
+              <div className="form-row">
+                <div className="label">Name</div>
+                <Controller
+                  control={control}
+                  name="name"
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Name"
+                      className="input-field"
+                    />
+                  )}
                 />
-              )}
-            />
-          </div>
-        </FormInputWrapperStyled>
+              </div>
+            </FormInputWrapperStyled>
 
-        <FormInputWrapperStyled>
-          <div className="form-row">
-            <div className="label">Mobile</div>
-            <Controller
-              control={control}
-              name="mobile"
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  placeholder="Mobile"
-                  className="input-field"
+            <FormInputWrapperStyled>
+              <div className="form-row">
+                <div className="label">Email</div>
+                <Controller
+                  control={control}
+                  name="email"
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Email"
+                      className="input-field"
+                    />
+                  )}
                 />
-              )}
-            />
-          </div>
-        </FormInputWrapperStyled>
+              </div>
+            </FormInputWrapperStyled>
 
-        <Button onClick={handleSubmit(onSubmit)} className="signup-button">
-          SignUp
-        </Button>
+            <FormInputWrapperStyled>
+              <div className="form-row">
+                <div className="label">Password</div>
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Password"
+                      className="input-field"
+                      type="password"
+                    />
+                  )}
+                />
+              </div>
+            </FormInputWrapperStyled>
 
-        <Button onClick={() => navigate("/login")} className="text-button">
-          Already have an account? Login
-        </Button>
-      </SignupContainerStyled>
-    </SignupWrapperStyled>
+            <FormInputWrapperStyled>
+              <div className="form-row">
+                <div className="label">Mobile</div>
+                <Controller
+                  control={control}
+                  name="mobile"
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Mobile"
+                      className="input-field"
+                    />
+                  )}
+                />
+              </div>
+            </FormInputWrapperStyled>
+
+            <Button onClick={handleSubmit(onSubmit)} className="signup-button">
+              Sign Up
+            </Button>
+
+            <Button onClick={() => navigate("/login")} className="text-button">
+              Already have an account? Login
+            </Button>
+          </SignupContainerStyled>
+        </SignupWrapperStyled>
+      </RightSectionStyled>
+    </SignupPageStyled>
   );
 };
 

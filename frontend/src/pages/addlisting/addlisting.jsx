@@ -6,6 +6,8 @@ import {
   BannerWrapperStyled,
   FormButtonWrapperStyled,
   FormInputWrapperStyled,
+  ImagesWrapperStyled,
+  ImageWrapperStyled,
 } from "./addlistingstyle";
 
 import { Input, Select } from "antd";
@@ -35,7 +37,9 @@ const AddListingContent = (props) => {
   const { isEditMode, isDuplicateMode, property } = props || {};
   const navigate = useNavigate();
 
-  console.log("property", property);
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
+  const listingId = useParams().id;
 
   const {
     propertyType = "",
@@ -52,7 +56,7 @@ const AddListingContent = (props) => {
     adress,
     houseNo,
     status,
-    images,
+    fileNames: alreadyUploadedImages,
   } = property || {};
 
   const {
@@ -62,6 +66,7 @@ const AddListingContent = (props) => {
     setValue,
     setError,
     watch,
+    getValues,
   } = useForm({
     defaultValues: {
       propertyType,
@@ -74,12 +79,11 @@ const AddListingContent = (props) => {
       bathrooms,
       title,
       desc,
-      images: [],
+      images: alreadyUploadedImages || [],
       yearBuilt,
       adress,
       houseNo,
       status,
-      images,
     },
     mode: "onChange",
     // resolver: yupResolver(signupFormSchema),
@@ -93,7 +97,7 @@ const AddListingContent = (props) => {
     garages: garagesWatched,
   } = watch();
 
-  const onSubmitValues = useCallback(async (values, isDraft) => {
+  const onSubmitValues = useCallback(async (values, isDraft, isEdited) => {
     const {
       propertyType,
       city,
@@ -114,6 +118,8 @@ const AddListingContent = (props) => {
 
     const formData = new FormData();
 
+    console.log("images", images);
+
     images.forEach((file) => {
       formData.append("images", file.originFileObj); // Append each file
     });
@@ -131,14 +137,19 @@ const AddListingContent = (props) => {
     formData.append("yearBuilt", yearBuilt);
     formData.append("adress", adress);
     formData.append("houseNo", houseNo);
-    formData.append("status", status);
     formData.append("isDraft", isDraft);
 
     const token = localStorage.getItem("token");
+
+    const url = isEdited
+      ? `http://localhost:8080/listing/edit-listing/${listingId}`
+      : "http://localhost:8080/listing/add-listing";
+
+    const method = isEdited ? "PUT" : "POST";
+
     try {
-      const url = `http://localhost:8080/listing/add-listing`;
       const response = await fetch(url, {
-        method: "POST",
+        method: method,
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -165,16 +176,12 @@ const AddListingContent = (props) => {
     onSubmitValues(values, true);
   }, []);
 
-  const onChange = (checked) => {
-    console.log(`switch to ${checked}`);
-  };
+  const onSaveAsEdit = useCallback((values) => {
+    onSubmitValues(values, false, true);
+  }, []);
 
   const onOptionChange = (name, option) => {
     setValue(name, option);
-  };
-
-  const onFileUpload = ({ fileList }) => {
-    setValue("images", fileList);
   };
 
   const pageTitle = isEditMode
@@ -375,15 +382,72 @@ const AddListingContent = (props) => {
               <div className="field-desc">
                 Properties with images of good quality generate 8X more leads.
               </div>
-              <Upload
-                multiple
-                listType="picture"
-                beforeUpload={() => false} // Prevent auto-upload
-                fileList={fileList}
-                onChange={onFileUpload}
-              >
-                <Button>Click to Upload</Button>
-              </Upload>
+
+              <Controller
+                control={control}
+                name="images"
+                render={({ field: { value, onChange } }) => {
+                  const handleUpload = ({ file, fileList }) => {
+                    const newImages = fileList.map((f) => f);
+                    onChange([...value, ...newImages]);
+                  };
+
+                  const handleRemove = (imgToRemove) => {
+                    const updated = value.filter(
+                      (img) =>
+                        typeof img === "string"
+                          ? img !== imgToRemove // remove old
+                          : img.uid !== imgToRemove.uid // remove new
+                    );
+
+                    onChange(updated);
+                  };
+
+                  return (
+                    <>
+                      <Upload
+                        multiple
+                        listType="picture"
+                        beforeUpload={() => false} // Prevent auto-upload
+                        onChange={handleUpload}
+                        showUploadList={false}
+                      >
+                        <Button>Click to Upload</Button>
+                      </Upload>
+                      <ImagesWrapperStyled>
+                        {Array.isArray(value) ? (
+                          value?.map((path, index) => {
+                            const isOld = typeof path === "string";
+
+                            const src = isOld
+                              ? `${API_URL}/uploads/${path}`
+                              : URL.createObjectURL(path.originFileObj);
+
+                            return (
+                              <ImageWrapperStyled>
+                                <div
+                                  className="delete-icon"
+                                  onClick={() => handleRemove(path)}
+                                >
+                                  x
+                                </div>
+
+                                <img
+                                  className="property-image"
+                                  src={src}
+                                  alt={`property-image-${index}`}
+                                />
+                              </ImageWrapperStyled>
+                            );
+                          })
+                        ) : (
+                          <>No images found</>
+                        )}
+                      </ImagesWrapperStyled>
+                    </>
+                  );
+                }}
+              />
             </FormInputWrapperStyled>
 
             <FormButtonWrapperStyled>
@@ -393,9 +457,18 @@ const AddListingContent = (props) => {
               >
                 Save as draft
               </Button>
-              <Button className="add-button" onClick={handleSubmit(onAdd)}>
-                Done
-              </Button>
+              {isEditMode ? (
+                <Button
+                  className="add-button"
+                  onClick={handleSubmit(onSaveAsEdit)}
+                >
+                  Save
+                </Button>
+              ) : (
+                <Button className="add-button" onClick={handleSubmit(onAdd)}>
+                  Add
+                </Button>
+              )}
             </FormButtonWrapperStyled>
           </AddListingFormStyled>
         </AddListingFormContainerStyled>
@@ -431,7 +504,6 @@ const AddListing = (props) => {
       setIsLoading(false);
       if (success) {
         const listing = result.data || {};
-        console.log("listing", listing);
         setProperty(listing);
       } else if (error) {
         const details = error?.details[0].message;

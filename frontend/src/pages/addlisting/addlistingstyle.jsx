@@ -168,3 +168,27 @@ export const FormButtonWrapperStyled = styled.div`
     width: 550px;
   }
 `;
+
+export const ImagesWrapperStyled = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 50px;
+`;
+
+export const ImageWrapperStyled = styled.div`
+  position: relative;
+
+  .delete-icon {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+  }
+
+  img {
+    border-radius: 8px;
+    width: 150px;
+    height: 150px;
+  }
+`;

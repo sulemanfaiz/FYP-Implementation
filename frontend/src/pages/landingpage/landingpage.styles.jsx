@@ -13,6 +13,7 @@ export const NavbarContainer = styled.nav`
 export const LeftSectionContainer = styled.nav`
   display: flex;
   align-items: center;
+  justify-content: center;
   // margin-right: 10rem;
 `;
 
@@ -25,17 +26,17 @@ export const Logo = styled.h1`
   color: #e85451;
 `;
 
-export const NavLinks = styled.ul`
-  list-style: none;
+export const NavLinks = styled.div`
   display: flex;
-  gap: 2rem;
+  column-gap: 2rem;
   flex-wrap: wrap;
   color: #37474f;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 16px;
+  margin: 8px 0px 0 30px;
 `;
 
-export const NavItem = styled.li`
+export const NavItem = styled.div`
   cursor: pointer;
 `;
 
@@ -89,10 +90,21 @@ export const FooterSection = styled.div`
   flex: 1;
   min-width: 150px;
   margin-bottom: 2rem;
+  display: flex; /* make it flex */
+  flex-direction: column; /* stack items vertically */
+  align-items: flex-start; /* align all items to the start */
 
   @media (max-width: 768px) {
     margin-bottom: 1.5rem;
   }
+
+  /* flex: 1;
+  min-width: 150px;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    margin-bottom: 1.5rem;
+  } */
 `;
 
 export const FooterHeading = styled.h3`
@@ -212,15 +224,13 @@ export const ArrowIcon = styled.div`
   font-size: 14px;
 `;
 
-export const ImageWrapper = styled.div`
-  padding: 10px;
-`;
+export const ImageWrapper = styled.div``;
 // components/BackgroundImage.styles.jsx
 
 export const BackgroundSection = styled.section`
-  background: url("Islamabad-Background-Image.jpg") center/cover no-repeat;
+  background: url("./property/islamabad.jpg") center/cover no-repeat;
   height: 80vh;
-  width: 100vw;
+  width: 100%;
   overflow: hidden;
   position: relative;
   display: flex;
@@ -242,7 +252,6 @@ export const Overlay = styled.div`
 export const Content = styled.div`
   position: relative;
   z-index: 1;
-  max-width: 800px;
   padding: 0 20px;
 `;
 
@@ -262,8 +271,7 @@ export const SearchContainer = styled.div`
 
 export const SearchInput = styled.input`
   padding: 25px 25px;
-  width: 60%;
-  max-width: 500px;
+  width: 550px;
   border: none;
   border-radius: 4px 0 0 4px;
   font-size: 1rem;
@@ -280,5 +288,49 @@ export const SearchButton = styled.button`
 
   &:hover {
     background-color: #b20710;
+  }
+`;
+
+export const InfoSectionStyled = styled.div`
+  padding: 15px;
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  row-gap: 7px;
+
+  .price {
+    font-weight: 600;
+  }
+
+  .type {
+    font-weight: normal;
+    color: rgb(55, 71, 79);
+  }
+
+  .amenties-section {
+    display: flex;
+    column-gap: 20px;
+    align-items: center;
+
+    .amenity {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      width: max-content;
+
+      .count {
+        font-size: 10px;
+      }
+    }
+  }
+
+  .title,
+  .desc {
+    font-weight: normal;
+    color: rgb(55, 71, 79);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
 `;

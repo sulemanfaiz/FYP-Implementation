@@ -1,164 +1,173 @@
-import { useParams } from "react-router-dom";
-import {
-  AddressCardStyled,
-  CarasolWrapperStyled,
-  DetailCardStyled,
-  DetailsCardStyled,
-  ListingDetailWrapperStyled,
-  ListingWrapperStyled,
-  OverviewCardStyled,
-} from "./listingdetailstyles";
-import { useEffect, useState } from "react";
-
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom"; // Import useParams to get the route parameter
+import { Divider, Modal } from "antd";
+import { IoBedOutline } from "react-icons/io5";
+import { FaBath } from "react-icons/fa";
+import { IoIosResize, IoIosCall } from "react-icons/io";
+import { CiMail } from "react-icons/ci";
 import { Carousel } from "antd";
+import {
+  ListingWrapperStyled,
+  ListingDetailWrapperStyled,
+  DetailCardStyled,
+  ButtonStyled,
+  TitleSectionStyled,
+  ImageSectionStyled,
+  CustomCarouselStyled,
+} from "./listingdetailstyles";
 
-const contentStyle = {
-  margin: 0,
-  height: "160px",
-  color: "#fff",
-  lineHeight: "160px",
-  textAlign: "center",
-  background: "#364d79",
-};
+const API_URL = process.env.REACT_APP_API_URL; // Replace with your actual API URL
+console.log("API URL:", API_URL);
 
 const ListingDetail = () => {
-  const params = useParams();
-  const propertyId = params.id;
-
-  const [property, setProperty] = useState({});
-  const token = localStorage.getItem("token");
-
-  const getListingDetailBasedOnId = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:8080/listing/get-listing-detail/" + propertyId,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`, // ✅ Important
-          },
-        }
-      );
-      const result = await response.json();
-      const { success, message, error } = result;
-      if (success) {
-        const listing = result.data || {};
-        console.log("listing", listing);
-        setProperty(listing);
-      } else if (error) {
-        const details = error?.details[0].message;
-      }
-    } catch (err) {
-      console.log("catch error", err);
-    }
-  };
+  const { id } = useParams();
+  console.log("Property ID:", id); // Get the property ID from the URL
+  console.log("API Endpoint:", `${API_URL}/properties/${id}`);
+  const [property, setProperty] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
-    getListingDetailBasedOnId();
-  }, []);
+    const fetchProperty = async () => {
+      try {
+        console.log("Fetching property with ID:", id); // Log the ID
+        const response = await fetch(
+          `${API_URL}/listing/get-listing-detail/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        console.log("API Response:", response); // Log the raw response
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log("Fetched Property Data:", result); // Log the parsed data
+        setProperty(result.data); // Set only the `data` key to the `property` state
+      } catch (error) {
+        console.error("Error fetching property details:", error); // Log the error
+      }
+    };
 
-  const onChange = (currentSlide) => {
-    console.log(currentSlide);
+    fetchProperty();
+  }, [id]);
+
+  const openSlider = (index) => {
+    setCurrentSlide(index);
+    setIsModalVisible(true);
   };
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+  const closeSlider = () => {
+    setIsModalVisible(false);
+  };
+
+  if (!property) {
+    return <div>Loading...</div>; // Show a loading state while fetching data
+  }
+  console.log("Rendering property data: ", property);
 
   return (
     <ListingWrapperStyled>
-      <div className="listing-title">{property?.title}</div>
-      <CarasolWrapperStyled>
-        <Carousel afterChange={onChange} dots={false} arrows>
-          {property?.fileNames?.map((path, index) => {
-            return (
-              <div>
+      {/* Image Section */}
+      {/* Image Section */}
+      <ImageSectionStyled>
+        {/* Main Image */}
+        <div className="main-image-wrapper" onClick={() => openSlider(0)}>
+          <img
+            src={`${API_URL}/uploads/${property?.fileNames?.[0]}`}
+            alt="Main Property"
+          />
+        </div>
+
+        {/* Smaller Images */}
+        <div className="small-images-wrapper">
+          {property?.fileNames?.slice(1, 3).map((path, index) => (
+            <div
+              key={index}
+              className="small-image"
+              onClick={() => openSlider(index + 1)}
+            >
+              <img
+                src={`${API_URL}/uploads/${path}`}
+                alt={`Property ${index}`}
+              />
+            </div>
+          ))}
+        </div>
+      </ImageSectionStyled>
+
+      {/* Modal for Image Slider */}
+      <Modal
+        visible={isModalVisible}
+        footer={null}
+        onCancel={closeSlider}
+        centered
+        width={800}
+      >
+        <CustomCarouselStyled>
+          <Carousel initialSlide={currentSlide} dots arrows>
+            {property?.fileNames?.map((path, index) => (
+              <div key={index}>
                 <img
-                  className="property-image"
                   src={`${API_URL}/uploads/${path}`}
-                  alt={`property-image-${index}`}
+                  alt={`Property Image ${index}`}
                 />
               </div>
-            );
-          })}
-        </Carousel>
-      </CarasolWrapperStyled>
-
-      <ListingDetailWrapperStyled className="ListingDetailWrapperStyled">
+            ))}
+          </Carousel>
+        </CustomCarouselStyled>
+      </Modal>
+      {/* Property Details Section */}
+      <ListingDetailWrapperStyled>
         <DetailCardStyled>
           <div className="name-price-wrapper">
-            <div className="property-name">{property?.title}</div>
+            <div className="property-name">
+              {console.log("Title:", property?.title)}
+              {property?.title}
+            </div>
             <div className="property-rent">
               <div className="rent">PKR {property?.rent}</div>
+
               <div className="month">/ month</div>
             </div>
           </div>
 
-          <div className="decription">
-            <div className="heading">Description</div>
-            <div className="text">{property?.desc}</div>
+          <div className="icons-wrapper">
+            <div className="icon-item">
+              <IoBedOutline /> {property?.bedrooms} Bedrooms
+            </div>
+            <div className="icon-item">
+              <FaBath /> {property?.bathrooms} Bathrooms
+            </div>
+            <div className="icon-item">
+              <IoIosResize /> {property?.areaSizeUnit}
+              {property?.areaSizeMetric}{" "}
+            </div>
+            <div className="icon-item">{property?.propertyType}</div>
           </div>
         </DetailCardStyled>
-        <DetailsCardStyled>
-          <div className="heading">Overview</div>
 
-          <div className="overview-row">
-            <div className="row-item">
-              <div>House No.</div>
-              <div>{property?.houseNo}</div>
-            </div>
-            <div className="row-item">
-              <div>Type</div>
-              <div>{property?.propertyType}</div>
-            </div>
-            <div className="row-item">
-              <div>Bedroom</div>
-              <div>{property?.bedrooms}</div>
-            </div>
-            <div className="row-item">
-              <div>Bathroom</div>
-              <div>{property?.bathrooms}</div>
-            </div>
+        <ButtonStyled>
+          <button className="call-button">
+            <IoIosCall /> Call
+          </button>
+          <button className="inquire-button">
+            <CiMail /> Inquire
+          </button>
+        </ButtonStyled>
+
+        {/* Divider */}
+        <Divider />
+
+        {/* Description */}
+        <TitleSectionStyled>
+          <h2>Description</h2>
+          <div className="property-description">
+            {property?.desc || "No description available for this property."}
           </div>
-
-          <div className="overview-row">
-            <div className="row-item">
-              <div>Size</div>
-              <div>{`${property?.areaSizeUnit} ${property?.areaSizeMetric}`}</div>
-            </div>
-
-            <div className="row-item">
-              <div>Garage</div>
-              <div>{property?.garages}</div>
-            </div>
-
-            <div className="row-item">
-              <div>Year Build</div>
-              <div>{property?.yearBuilt}</div>
-            </div>
-
-            <div className="row-item">
-              <div>Status.</div>
-              <div>{property?.status}</div>
-            </div>
-          </div>
-        </DetailsCardStyled>
-        <AddressCardStyled>
-          <div className="heading">Address</div>
-
-          <div className="adress-row">
-            <div className="key">City</div>
-            <div className="value">{property?.city}</div>
-          </div>
-
-          <div className="adress-row">
-            <div className="key">Adress</div>
-            <div className="value">{property?.adress}</div>
-          </div>
-
-          <div className="adress-row">
-            <div className="key">Country</div>
-            <div className="value">Pakistan</div>
-          </div>
-        </AddressCardStyled>
+        </TitleSectionStyled>
       </ListingDetailWrapperStyled>
     </ListingWrapperStyled>
   );

@@ -2,16 +2,16 @@
 import "./App.css";
 import AddListing from "./pages/addlisting";
 import Dashboard from "./pages/dashboard";
-import Home from "./pages/home";
 import Listing from "./pages/listing";
 import ListingDetail from "./pages/listingdetail";
 import Login from "./pages/login/login";
 import SignUp from "./pages/signup/signup";
 import MyProperties from "./pages/myproperties";
 import MyProperty from "./pages/myproperty";
-import LandingPage from "./pages/landingpage/landingpage";
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import LandingPage from "./pages/landingpage/landingpage";
+import Home from "./pages/home/home";
 
 function App() {
   return (

@@ -1,72 +1,105 @@
 import styled from "styled-components";
 
+export const SignupPageStyled = styled.div`
+  display: flex;
+  height: 100vh;
+`;
+
+export const LeftSectionStyled = styled.div`
+  flex: 1;
+  background-color: #e85451;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+
+  .logo {
+    width: 150px;
+    height: auto;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.2rem;
+    max-width: 300px;
+  }
+`;
+
+export const RightSectionStyled = styled.div`
+  flex: 1;
+  background-color: #f7f7f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 export const SignupWrapperStyled = styled.div`
-  padding: 60px;
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+
+  .signup-heading {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .signup-description {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #555;
+    font-size: 1rem;
+  }
 `;
 
 export const SignupContainerStyled = styled.div`
-  margin-top: 25px;
   display: flex;
-  align-items: center;
   flex-direction: column;
+  gap: 1rem;
 
   .signup-button {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    width: 100px;
-    height: 35px;
-    border-color: #e85451;
-    color: #e85451;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background-color: #e85451;
+    color: white;
+    font-weight: bold;
+    margin-top: 1rem;
+    padding: 20px 20px;
     border-radius: 4px;
-    flex-direction: column;
-
-    &.ant-btn-variant-outlined:hover {
-      background-color: #fff;
-      border-color: #e85451;
-      color: #e85451;
-    }
   }
 
   .text-button {
+    background: none;
+    border: none;
     color: #e85451;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    flex-direction: column;
+    margin-top: 1rem;
     text-decoration: underline;
-    outline: unset;
-    border: unset;
-    box-shadow: unset;
   }
 `;
 
 export const FormInputWrapperStyled = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  margin: 20px 0;
-
   .form-row {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-  }
+    gap: 0.5rem;
 
-  .label {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 15px;
-    text-align: left;
-  }
+    .label {
+      font-weight: bold;
+      font-size: 0.9rem;
+      color: #333;
+    }
 
-  .input-field {
-    width: 450px;
-    height: 45px;
+    .input-field {
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
   }
 `;

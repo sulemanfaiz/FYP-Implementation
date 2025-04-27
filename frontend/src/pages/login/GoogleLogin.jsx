@@ -7,12 +7,17 @@ const GoogleLogin = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (window.google && window.google.accounts && window.google.accounts.id) {
+      if (
+        window.google &&
+        window.google.accounts &&
+        window.google.accounts.id
+      ) {
         clearInterval(interval);
 
         try {
           window.google.accounts.id.initialize({
-            client_id: "55423345249-c305uo0t6m3l0niv8cil3bi2grhgkio3.apps.googleusercontent.com",
+            client_id:
+              "55423345249-c305uo0t6m3l0niv8cil3bi2grhgkio3.apps.googleusercontent.com",
             callback: handleCredentialResponse,
           });
 

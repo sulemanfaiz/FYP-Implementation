@@ -89,6 +89,16 @@ const ListingSchema = new Schema({
     type: String,
     // required: true,
   },
+
+  comment: {
+    type: String,
+    // required: false,
+  },
+
+  reason: {
+    type: String,
+    // required: false,
+  },
 });
 
 const ListingModel = mongoose.model("listings", ListingSchema);

@@ -10,11 +10,16 @@ import {
 } from "./propertycard.styles";
 
 import { Button, ConfigProvider, Flex, Popover } from "antd";
+import { useState } from "react";
+import SetAsInActiveModal from "../setasinactivemodal/setasinactivemodal";
 
 const MoreActions = (props) => {
   const { propertyId } = props || {};
   const navigate = useNavigate();
-
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const onViewClick = () => {
+    navigate(`/listing/${propertyId}`); // Navigate to the ListingDetail page with the property ID
+  };
   const onEditClick = () => {
     navigate("/edit-property/" + propertyId);
   };
@@ -23,13 +28,36 @@ const MoreActions = (props) => {
     navigate("/duplicate-property/" + propertyId);
   };
 
+  const onMarkInactiveClick = () => {
+    setIsModalVisible(true); // Show the modal
+  };
+  const handleModalSubmit = (data) => {
+    setIsModalVisible(false); // Close the modal after submission
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false); // Close the modal without submission
+  };
+
   return (
     <div className="more-actions">
+      <MoreActionItemStyled onClick={onViewClick}>View</MoreActionItemStyled>
       <MoreActionItemStyled onClick={onEditClick}>Edit</MoreActionItemStyled>
       <MoreActionItemStyled onClick={onDuplicateClick}>
         Duplicate Property
       </MoreActionItemStyled>
-      <MoreActionItemStyled>Mark As In-Active</MoreActionItemStyled>
+      <MoreActionItemStyled onClick={onMarkInactiveClick}>
+        Mark As In-Active
+      </MoreActionItemStyled>
+      <MoreActionItemStyled onClick={onMarkInactiveClick}>
+        View
+      </MoreActionItemStyled>
+
+      <SetAsInActiveModal
+        visible={isModalVisible}
+        onClose={handleModalClose}
+        onSubmit={handleModalSubmit}
+      />
     </div>
   );
 };
@@ -45,7 +73,11 @@ const PropertyCard = (props) => {
     propertyType,
     areaSizeUnit,
     areaSizeMetric,
+    fileNames,
   } = listing || {};
+
+  const imgExists = fileNames?.length > 0;
+  const path = fileNames?.[0];
 
   const propertyTypeText =
     propertyOptions?.find((property) => property.value === propertyType)
@@ -57,6 +89,8 @@ const PropertyCard = (props) => {
 
   const content = <MoreActions propertyId={listing?._id} />;
 
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
   return (
     <PropertyCardWrapperStyled onClick={propsOnClick} className="property-card">
       {showActions && (
@@ -67,7 +101,15 @@ const PropertyCard = (props) => {
         </MoreButtonWrapperStyled>
       )}
       <div className="img-section">
-        <img src="/property/adminpropertyimg.jpg" alt="Banner" />
+        {imgExists ? (
+          <img
+            className="property-image"
+            src={`${API_URL}/uploads/${path}`}
+            alt="property-image"
+          />
+        ) : (
+          <img src="/property/adminpropertyimg.jpg" alt="Banner" />
+        )}
       </div>
 
       <div className="info-section">

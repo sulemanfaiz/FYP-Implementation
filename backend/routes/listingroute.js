@@ -4,6 +4,9 @@ const {
   addlisting,
   getListing,
   getListingDetail,
+  editListing,
+  getAllListings,
+  markListingAsInactive,
 } = require("../controllers/listingcontroller");
 const verifyToken = require("../middlewares/auth");
 
@@ -27,7 +30,18 @@ router.post(
   addlisting
 );
 
-router.get("/get-listings", verifyToken, getListing);
+router.put(
+  "/edit-listing/:id",
+  verifyToken,
+  upload.array("images", 10),
+  editListing
+);
+
+router.patch("/mark-as-inactive/:id", verifyToken, markListingAsInactive);
+
+router.get("/get-user-listings", verifyToken, getListing);
+
+router.get("/get-all-listings", verifyToken, getAllListings);
 
 router.get("/get-listing-detail/:id", verifyToken, getListingDetail);
 

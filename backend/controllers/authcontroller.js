@@ -15,9 +15,19 @@ const signup = async (req, res) => {
     const userModel = new UserModel({ name, email, password, mobile });
     userModel.password = await bcrypt.hash(password, 10);
     await userModel.save();
+
+    const jwtToken = jwt.sign(
+      { email: userModel.email, _id: userModel._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
     res.status(201).json({
-      message: "Signup successfully",
+      message: "Signup successful",
       success: true,
+      jwtToken,
+      email: userModel.email,
+      name: userModel.name,
     });
   } catch (err) {
     console.log("controller err", err);

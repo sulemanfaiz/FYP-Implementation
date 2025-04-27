@@ -1,72 +1,106 @@
 import styled from "styled-components";
+import { Button } from "antd";
+export const LoginPageStyled = styled.div`
+  display: flex;
+  height: 100vh;
+`;
+
+export const LeftSectionStyled = styled.div`
+  flex: 1;
+  background-color: #e85451;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+
+  .content {
+    text-align: center;
+    color: white;
+  }
+
+  .logo {
+    width: 180px;
+    height: auto;
+    margin-bottom: 20px;
+  }
+
+  .welcome-heading {
+    font-size: 32px;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
+  .tagline {
+    font-size: 18px;
+    font-style: italic;
+    opacity: 0.9;
+  }
+`;
+
+export const RightSectionStyled = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+`;
 
 export const LoginWrapperStyled = styled.div`
-  padding: 60px;
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+
+  .login-heading {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+  }
+
+  .login-description {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+  }
 `;
 
 export const LoginContainerStyled = styled.div`
-  margin-top: 25px;
   display: flex;
-  align-items: center;
   flex-direction: column;
-
-  .login-button {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    width: 100px;
-    height: 35px;
-    border-color: #e85451;
-    color: #e85451;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    flex-direction: column;
-
-    &.ant-btn-variant-outlined:hover {
-      background-color: #fff;
-      border-color: #e85451;
-      color: #e85451;
-    }
-  }
-
-  .text-button {
-    color: #e85451;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    flex-direction: column;
-    text-decoration: underline;
-    outline: unset;
-    border: unset;
-    box-shadow: unset;
-  }
+  gap: 20px;
 `;
 
 export const FormInputWrapperStyled = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  margin: 20px 0;
-
   .form-row {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-  }
+    gap: 8px;
 
-  .label {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 15px;
-    text-align: left;
-  }
+    .label {
+      font-size: 14px;
+      color: #333;
+      font-weight: 600;
+    }
 
-  .input-field {
-    width: 450px;
-    height: 45px;
+    .input-field {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 15px;
+      transition: all 0.3s;
+
+      // &:focus {
+      //   border-color: #007bff;
+      //   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+      // }
+    }
+  }
+`;
+export const StyledButton = styled(Button)`
+  &,
+  &:hover,
+  &:disabled {
+    background-color: #d43e3a !important;
+    color: white !important;
   }
 `;
