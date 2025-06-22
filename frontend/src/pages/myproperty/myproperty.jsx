@@ -4,11 +4,13 @@ import StyledTabs from "../../components/styledtabs";
 import {
   MyPopertyBannerWrapperStyled,
   MyPopertyPageStyled,
+  MyPopertyPageWrapperStyled,
   PropertyListingStyled,
 } from "./myproperty.styles";
 
 import { useEffect, useState } from "react";
 import PageBanner from "../../components/pagebanner";
+import Header from "../../components/header/header";
 
 const MyPoperties = () => {
   const [property, setProperty] = useState({});
@@ -49,14 +51,17 @@ const MyPoperties = () => {
 
   return (
     <MyPopertyPageStyled>
-      <PageBanner
-        heading="Property Details"
-        description={`Property details for ${property?.title}`}
-      />
+      <Header />
+      <MyPopertyPageWrapperStyled>
+        <PageBanner
+          heading="Property Details"
+          description={`Property details for ${property?.title}`}
+        />
 
-      <PropertyListingStyled>
-        <PropertyCard listing={property} showActions />
-      </PropertyListingStyled>
+        <PropertyListingStyled>
+          <PropertyCard listing={property} showActions />
+        </PropertyListingStyled>
+      </MyPopertyPageWrapperStyled>
     </MyPopertyPageStyled>
   );
 };

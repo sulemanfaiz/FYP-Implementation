@@ -9,7 +9,7 @@ import {
   ImagesWrapperStyled,
   ImageWrapperStyled,
 } from "./addlistingstyle";
-
+import { useToast } from "../../hooks/useToast";
 import { Input, Select } from "antd";
 import { Switch } from "antd";
 
@@ -32,11 +32,16 @@ import ToggleSelect from "../../components/toggleselect";
 
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import AddAmenitiesModal from "../addamenitiesmodal";
+import Header from "../../components/header/header";
+import ToastProvider from "../../components/toast componenet/ToastProvider";
 
 const AddListingContent = (props) => {
+  const [isFeatureModalVisible, setIsFeatureModalVisible] = useState(false);
+
   const { isEditMode, isDuplicateMode, property } = props || {};
   const navigate = useNavigate();
-
+  const { showSuccess, showError, showLoading, dismiss } = useToast();
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   const listingId = useParams().id;
@@ -57,6 +62,7 @@ const AddListingContent = (props) => {
     houseNo,
     status,
     fileNames: alreadyUploadedImages,
+    features = [],
   } = property || {};
 
   const {
@@ -84,6 +90,7 @@ const AddListingContent = (props) => {
       adress,
       houseNo,
       status,
+      features,
     },
     mode: "onChange",
     // resolver: yupResolver(signupFormSchema),
@@ -95,90 +102,154 @@ const AddListingContent = (props) => {
     bedrooms: bedroomsWatched,
     bathrooms: bathroomsWatched,
     garages: garagesWatched,
+    isSeasonalDiscount: isSeasonalDiscountWatched,
   } = watch();
 
-  const onSubmitValues = useCallback(async (values, isDraft, isEdited) => {
-    const {
-      propertyType,
-      city,
-      areaSizeUnit,
-      areaSizeMetric,
-      rent,
-      bedrooms,
-      garages,
-      bathrooms,
-      title,
-      desc,
-      images,
-      yearBuilt,
-      status,
-      adress,
-      houseNo,
-    } = values || {};
+  const onFeatureModalOpen = () => {
+    setIsFeatureModalVisible(true);
+  };
 
-    const formData = new FormData();
+  const onFeatureModalClose = (data) => {
+    setIsFeatureModalVisible(false);
+  };
 
-    console.log("images", images);
+  const onFeaturesSaved = (data) => {
+    setValue(
+      "features",
+      data?.map((f) => ({ key: f.key, label: f.label, count: f.count || 0 }))
+    );
+    onFeatureModalClose();
+  };
 
-    images.forEach((file) => {
-      formData.append("images", file.originFileObj); // Append each file
-    });
+  const onSubmitValues = useCallback(
+    async (values, isDraft, isEdited) => {
+      const toastId = showLoading(
+        isEdited
+          ? "Updating listing…"
+          : isDraft
+          ? "Saving draft…"
+          : "Adding listing…"
+      );
+      const {
+        propertyType,
+        city,
+        areaSizeUnit,
+        areaSizeMetric,
+        rent,
+        bedrooms,
+        garages,
+        bathrooms,
+        title,
+        desc,
+        images,
+        yearBuilt,
+        status,
+        adress,
+        houseNo,
+        features = [],
+        isSeasonalDiscount,
+        discountStartDate,
+        discountEndDate,
+        discountPercentage,
+        discountLabel,
+      } = values || {};
 
-    formData.append("propertyType", propertyType);
-    formData.append("city", city);
-    formData.append("areaSizeUnit", areaSizeUnit);
-    formData.append("areaSizeMetric", areaSizeMetric);
-    formData.append("rent", rent);
-    formData.append("bedrooms", bedrooms);
-    formData.append("bathrooms", bathrooms);
-    formData.append("title", title);
-    formData.append("desc", desc);
-    formData.append("garages", garages);
-    formData.append("yearBuilt", yearBuilt);
-    formData.append("adress", adress);
-    formData.append("houseNo", houseNo);
-    formData.append("isDraft", isDraft);
+      const formData = new FormData();
 
-    const token = localStorage.getItem("token");
-
-    const url = isEdited
-      ? `http://localhost:8080/listing/edit-listing/${listingId}`
-      : "http://localhost:8080/listing/add-listing";
-
-    const method = isEdited ? "PUT" : "POST";
-
-    try {
-      const response = await fetch(url, {
-        method: method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
+      images.forEach((file) => {
+        if (file.originFileObj instanceof File) {
+          formData.append("images", file.originFileObj);
+        }
       });
-      const result = await response.json();
 
-      const { success, message, error } = result;
-      if (success) {
-        navigate("/my-properties");
-      } else if (error) {
-        const details = error?.details[0].message;
+      const existingImageUrls = images
+        .filter((file) => typeof file === "string" || !file.originFileObj)
+        .map((file) => (typeof file === "string" ? file : file.url));
+
+      formData.append("existingImages", JSON.stringify(existingImageUrls));
+      formData.append("propertyType", propertyType);
+      formData.append("city", city);
+      formData.append("areaSizeUnit", areaSizeUnit);
+      formData.append("areaSizeMetric", areaSizeMetric);
+      formData.append("rent", rent);
+      formData.append("bedrooms", bedrooms);
+      formData.append("bathrooms", bathrooms);
+      formData.append("title", title);
+      formData.append("desc", desc);
+      formData.append("garages", garages);
+      formData.append("yearBuilt", yearBuilt);
+      formData.append("adress", adress);
+      formData.append("houseNo", houseNo);
+      formData.append("isDraft", isDraft);
+      formData.append("features", JSON.stringify(features));
+      formData.append("isDiscountEnabled", isSeasonalDiscount);
+      formData.append("discountStartDate", discountStartDate);
+      formData.append("discountEndDate", discountEndDate);
+      formData.append("discountPercentage", discountPercentage);
+      formData.append("discountLabel", discountLabel);
+
+      const token = localStorage.getItem("token");
+
+      const url = isEdited
+        ? `${API_URL}/listing/edit-listing/${listingId}`
+        : `${API_URL}/listing/add-listing`;
+
+      const method = isEdited ? "PUT" : "POST";
+
+      try {
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+        const result = await response.json();
+        dismiss(toastId);
+        const { success, message, error } = result;
+        if (success) {
+          showSuccess(
+            isEdited
+              ? "✅ Listing updated successfully!"
+              : isDraft
+              ? "✅ Draft saved successfully!"
+              : "✅ Listing added successfully!"
+          );
+          navigate("/my-properties");
+        } else if (error) {
+          const msg =
+            error?.details?.[0]?.message || message || "Action failed.";
+          showError(`❌ ${msg}`);
+        }
+      } catch (err) {
+        dismiss(toastId);
+        console.error("catch error", err);
+        showError("❌ Something went wrong. Please try again later.");
       }
-    } catch (err) {
-      console.log("catch error", err);
-    }
-  }, []);
+    },
+    [API_URL, listingId, navigate, showError, showLoading, showSuccess, dismiss]
+  );
 
-  const onAdd = useCallback((values) => {
-    onSubmitValues(values, false);
-  }, []);
+  const onAdd = useCallback(
+    (values) => {
+      onSubmitValues(values, false, false);
+    },
+    [onSubmitValues]
+  );
 
-  const onSaveAsDraft = useCallback((values) => {
-    onSubmitValues(values, true);
-  }, []);
+  const onSaveAsDraft = useCallback(
+    (values) => {
+      onSubmitValues(values, true, false);
+    },
+    [onSubmitValues]
+  );
 
-  const onSaveAsEdit = useCallback((values) => {
-    onSubmitValues(values, false, true);
-  }, []);
+  const onSaveAsEdit = useCallback(
+    (values) => {
+      onSubmitValues(values, false, true);
+    },
+    [onSubmitValues]
+  );
 
   const onOptionChange = (name, option) => {
     setValue(name, option);
@@ -190,8 +261,13 @@ const AddListingContent = (props) => {
     ? "Duplicate your property"
     : "Add your property details";
 
+  const onChange = (checked) => {
+    setValue("isSeasonalDiscount", checked);
+  };
+
   return (
     <AddListingPageStyled>
+      <Header />
       <BannerWrapperStyled>
         <div className="text">{pageTitle}</div>
         <div className="desc">
@@ -363,6 +439,18 @@ const AddListingContent = (props) => {
             </FormInputWrapperStyled>
 
             <FormInputWrapperStyled>
+              <div className="ques">What amenities are available?</div>
+
+              <div className="field-desc">
+                Add additional features e.g balcony, utilities, security details
+                etc. (Optional)
+              </div>
+              <div className="add-container" onClick={onFeatureModalOpen}>
+                Add Features
+              </div>
+            </FormInputWrapperStyled>
+
+            <FormInputWrapperStyled>
               <div className="ques">What do you love about the place?</div>
               <Controller
                 control={control}
@@ -450,6 +538,87 @@ const AddListingContent = (props) => {
               />
             </FormInputWrapperStyled>
 
+            <FormInputWrapperStyled>
+              <div className="ques">
+                Wanna Enable Seasonal Discount on your property?
+                <Controller
+                  control={control}
+                  name="isSeasonalDiscount"
+                  render={({ field }) => <Switch onChange={onChange} />}
+                />
+              </div>
+            </FormInputWrapperStyled>
+
+            {isSeasonalDiscountWatched && (
+              <>
+                <FormInputWrapperStyled>
+                  <div className="ques">What will be the discount title?</div>
+                  <Controller
+                    control={control}
+                    name="discountLabel"
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        placeholder="e.g Seasonal Summer Discount"
+                        className="input-field"
+                      />
+                    )}
+                  />
+                </FormInputWrapperStyled>
+
+                <FormInputWrapperStyled>
+                  <div className="ques">What is discount percentage (%)?</div>
+                  <Controller
+                    control={control}
+                    name="discountPercentage"
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        placeholder="e.g 10%"
+                        className="input-field"
+                      />
+                    )}
+                  />
+                </FormInputWrapperStyled>
+
+                <FormInputWrapperStyled>
+                  <div className="ques">
+                    Choose when the discount should begin.
+                  </div>
+                  <Controller
+                    control={control}
+                    name="discountStartDate"
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        placeholder="e.g 10%"
+                        className="input-field"
+                        type="date"
+                      />
+                    )}
+                  />
+                </FormInputWrapperStyled>
+
+                <FormInputWrapperStyled>
+                  <div className="ques">
+                    Choose when the discount should end.
+                  </div>
+                  <Controller
+                    control={control}
+                    name="discountEndDate"
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        placeholder="e.g 10%"
+                        className="input-field"
+                        type="date"
+                      />
+                    )}
+                  />
+                </FormInputWrapperStyled>
+              </>
+            )}
+
             <FormButtonWrapperStyled>
               <Button
                 className="cancel-button"
@@ -469,6 +638,13 @@ const AddListingContent = (props) => {
                   Add
                 </Button>
               )}
+
+              <AddAmenitiesModal
+                visible={isFeatureModalVisible}
+                onClose={onFeatureModalClose}
+                onSubmit={onFeaturesSaved}
+                existingAmenities={features}
+              />
             </FormButtonWrapperStyled>
           </AddListingFormStyled>
         </AddListingFormContainerStyled>

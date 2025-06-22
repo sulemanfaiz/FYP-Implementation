@@ -1,4 +1,5 @@
 const ListingModel = require("../models/listing");
+const LikedListingModel = require("../models/likedlisting");
 
 const addlisting = async (req, res) => {
   try {
@@ -8,12 +9,15 @@ const addlisting = async (req, res) => {
 
     const isDraft = req.body.isDraft === "true" ? true : false;
 
+    const propertyFeatures = JSON.parse(req.body.features);
+
     const listingData = {
       ...req.body,
       fileNames: imageFileNames, // Save file path in DB
       paths: imagePaths, // Save file path in DB
       userId: userId,
       status: isDraft ? "DFT" : "ACT",
+      features: propertyFeatures,
     };
 
     const listingModel = new ListingModel(listingData);
@@ -55,6 +59,8 @@ const editListing = async (req, res) => {
       });
     }
 
+    const propertyFeatures = JSON.parse(req.body.features);
+
     // Handle new images if uploaded
     let updatedFileNames = existingListing.fileNames || [];
     let updatedPaths = existingListing.paths || [];
@@ -71,6 +77,7 @@ const editListing = async (req, res) => {
       ...req.body,
       fileNames: updatedFileNames,
       paths: updatedPaths,
+      features: propertyFeatures,
     });
 
     res.status(200).json({
@@ -90,8 +97,6 @@ const getListing = async (req, res) => {
   try {
     const userId = req.user._id; // get user id from token
 
-    console.log("userId", userId);
-
     const listings = await ListingModel.find({ userId });
     res.status(200).json({
       success: true,
@@ -110,13 +115,28 @@ const getAllListings = async (req, res) => {
   try {
     const listings = await ListingModel.find(); // no filter, get everything
 
-    res.status(200).json({
+    let likedListingIds = [];
+
+    // If user is logged in, get liked listings
+
+    if (req.user) {
+      const userId = req.user._id;
+      const liked = await LikedListingModel.find({ userId });
+      likedListingIds = liked.map((like) => like.listingId.toString());
+    }
+
+    const listingsWithLikeFlag = listings.map((listing) => ({
+      ...listing.toObject(),
+      isLiked: likedListingIds.includes(listing._id.toString()),
+    }));
+
+    return res.status(200).json({
       success: true,
-      listings,
+      listings: listingsWithLikeFlag,
     });
   } catch (error) {
     console.error("Error fetching all listings:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Internal server error",
     });

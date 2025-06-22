@@ -1,7 +1,9 @@
 import styled from "styled-components";
 
-export const MyPopertyPageStyled = styled.div`
-  padding: 60px;
+export const MyPopertyPageStyled = styled.div``;
+
+export const MyPopertyPageWrapperStyled = styled.div`
+  padding: 45px 60px;
 `;
 
 export const PropertyListingStyled = styled.div`

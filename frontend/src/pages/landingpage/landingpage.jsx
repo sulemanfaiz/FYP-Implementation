@@ -20,14 +20,6 @@ import {
   FaHeart,
 } from "react-icons/fa";
 import { MdEmail, MdPhone } from "react-icons/md";
-import {
-  NavbarContainer,
-  Logo,
-  NavLinks,
-  NavItem,
-  SignInButton,
-  LeftSectionContainer,
-} from "./landingpage.styles";
 
 import {
   BackgroundSection,
@@ -46,6 +38,8 @@ import {
   propertyOptions,
 } from "../addlisting/addlisting.config";
 import { useNavigate } from "react-router-dom";
+import { Button, Popover } from "antd";
+import { Header, ProfileMenu } from "../../components";
 
 const cities = cityOptions;
 const propertySizes = areaSizeOptions;
@@ -93,8 +87,6 @@ const LandingPage = () => {
     setFilterByType(value);
   };
 
-  console.log("filters", { filterByCity, filterBySize, filterByType });
-
   const token = localStorage.getItem("token");
 
   const [listings, setListings] = useState([]);
@@ -104,9 +96,7 @@ const LandingPage = () => {
         "http://localhost:8080/listing/get-all-listings",
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`, // ✅ Important
-          },
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
       );
       const result = await response.json();
@@ -130,28 +120,13 @@ const LandingPage = () => {
     getAllListings();
   }, []);
 
+  const isLoggedIn = !!token;
+
+  const content = <ProfileMenu />;
+
   return (
     <div>
-      <NavbarContainer role="navigation" aria-label="Main navigation">
-        <LeftSectionContainer>
-          <Logo tabIndex="0">Kiraye Pa</Logo>
-          <NavLinks>
-            <NavItem tabIndex="0">List It Now</NavItem>
-            <NavItem tabIndex="0">About Us</NavItem>
-            <NavItem tabIndex="0">SmartRent AI</NavItem>
-          </NavLinks>
-        </LeftSectionContainer>
-
-        <SignInButton
-          aria-label="Sign In"
-          className="SignInButton"
-          onClick={() => {
-            navigate("/login");
-          }}
-        >
-          Sign In
-        </SignInButton>
-      </NavbarContainer>
+      <Header />
 
       <BackgroundSection className="BackgroundSection">
         <Overlay />

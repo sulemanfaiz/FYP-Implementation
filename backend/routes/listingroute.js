@@ -8,7 +8,8 @@ const {
   getAllListings,
   markListingAsInactive,
 } = require("../controllers/listingcontroller");
-const verifyToken = require("../middlewares/auth");
+
+const { verifyToken, safeVerifyToken } = require("../middlewares/auth");
 
 const router = require("express").Router();
 
@@ -41,7 +42,7 @@ router.patch("/mark-as-inactive/:id", verifyToken, markListingAsInactive);
 
 router.get("/get-user-listings", verifyToken, getListing);
 
-router.get("/get-all-listings", verifyToken, getAllListings);
+router.get("/get-all-listings", safeVerifyToken, getAllListings);
 
 router.get("/get-listing-detail/:id", verifyToken, getListingDetail);
 

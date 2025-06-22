@@ -99,6 +99,36 @@ const ListingSchema = new Schema({
     type: String,
     // required: false,
   },
+
+  features: [
+    {
+      key: { type: String },
+      label: { type: String },
+      count: { type: Number, default: 0 },
+    },
+  ],
+
+  isDiscountEnabled: {
+    type: String,
+    // required: false,
+  },
+
+  discountStartDate: {
+    type: String,
+    // required: false,
+  },
+  discountEndDate: {
+    type: String,
+    // required: false,
+  },
+  discountPercentage: {
+    type: String,
+    // required: false,
+  },
+  discountLabel: {
+    type: String,
+    // required: false,
+  },
 });
 
 const ListingModel = mongoose.model("listings", ListingSchema);

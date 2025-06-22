@@ -135,10 +135,3 @@ export const AreaButton = styled.button`
     background-color: #e85451;
   }
 `;
-
-export const AreaImage = styled.img`
-  width: 100%;
-  height: 200px;
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-`;

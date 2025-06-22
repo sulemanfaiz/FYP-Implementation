@@ -1,8 +1,10 @@
 import { Button } from "antd";
 import styled from "styled-components";
 
-export const MyPopertiesPageStyled = styled.div`
-  padding: 60px;
+export const MyPopertiesPageStyled = styled.div``;
+
+export const MyPopertiesPageWrapperStyled = styled.div`
+  padding: 45px 60px;
 `;
 
 export const PropertiesListingStyled = styled.div`

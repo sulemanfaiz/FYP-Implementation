@@ -4,6 +4,7 @@ import {
   AddPropertyButtonStyled,
   ListingsStyled,
   MyPopertiesPageStyled,
+  MyPopertiesPageWrapperStyled,
   NoListingFoundStyled,
   PropertiesListingStyled,
 } from "./myproperties.styles";
@@ -12,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import PageBanner from "../../components/pagebanner";
+import Header from "../../components/header/header";
 
 const PropertyListing = (props) => {
   const { listings } = props || {};
@@ -20,8 +22,6 @@ const PropertyListing = (props) => {
   const onPropertyClick = (propertyId) => {
     navigate("/my-properties/" + propertyId);
   };
-
-  console.log("listings", listings);
 
   const isListingEmpty = !listings || listings?.length === 0;
 
@@ -45,7 +45,8 @@ const PropertyListing = (props) => {
   );
 };
 
-const MyPoperties = () => {
+const MyPoperties = (props) => {
+  const { isLikedPropertiesListing } = props;
   const [tab, setTab] = useState("1");
   const [listings, setListings] = useState([]);
   const navigate = useNavigate();
@@ -104,9 +105,15 @@ const MyPoperties = () => {
   const token = localStorage.getItem("token");
 
   const getUserListings = async () => {
+    const urlContrller = isLikedPropertiesListing ? "likedlisting" : "listing";
+
+    const urlEndPoint = isLikedPropertiesListing
+      ? "get-user-liked-listings"
+      : "get-user-listings";
+
     try {
       const response = await fetch(
-        "http://localhost:8080/listing/get-user-listings",
+        `http://localhost:8080/listing/get-user-listings`,
         {
           method: "GET",
           headers: {
@@ -134,17 +141,25 @@ const MyPoperties = () => {
 
   return (
     <MyPopertiesPageStyled>
-      <PageBanner
-        heading="My Properties"
-        description="Your added properties at a glance — update, view, or remove as needed"
-      />
+      <Header />
+      <MyPopertiesPageWrapperStyled>
+        <PageBanner
+          heading={`${isLikedPropertiesListing ? "Liked" : "My"} Properties`}
+          description={`Your ${
+            isLikedPropertiesListing ? "liked" : "added"
+          } properties at a glance — update, view, or remove as needed`}
+        />
 
-      <PropertiesListingStyled>
-        <AddPropertyButtonStyled onClick={() => navigate("/add-property")}>
-          Add Property
-        </AddPropertyButtonStyled>
-        <StyledTabs items={items} onChange={onChange} />
-      </PropertiesListingStyled>
+        <PropertiesListingStyled>
+          {!isLikedPropertiesListing && (
+            <AddPropertyButtonStyled onClick={() => navigate("/add-property")}>
+              Add Property
+            </AddPropertyButtonStyled>
+          )}
+
+          <StyledTabs items={items} onChange={onChange} />
+        </PropertiesListingStyled>
+      </MyPopertiesPageWrapperStyled>
     </MyPopertiesPageStyled>
   );
 };

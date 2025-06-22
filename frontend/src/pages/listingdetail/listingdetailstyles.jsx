@@ -1,9 +1,12 @@
 import styled from "styled-components";
 
+export const ListingStyled = styled.div``;
+
 // Listing Main Wrapper
 export const ListingWrapperStyled = styled.div`
   padding: 2rem;
-  background-color: #f8f8f8;
+  max-width: 85%;
+  margin: 0 auto;
 `;
 
 // Detail Section Wrapper
@@ -14,9 +17,7 @@ export const ListingDetailWrapperStyled = styled.div`
 // Property Detail Card
 export const DetailCardStyled = styled.div`
   background: white;
-  padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.08);
 
   .name-price-wrapper {
     display: flex;
@@ -33,12 +34,6 @@ export const DetailCardStyled = styled.div`
   .property-rent {
     display: flex;
     align-items: baseline;
-  }
-
-  .rent {
-    font-size: 22px;
-    font-weight: bold;
-    color: #007bff;
   }
 
   .month {
@@ -65,9 +60,8 @@ export const DetailCardStyled = styled.div`
 
 // Button Section
 export const ButtonStyled = styled.div`
-  margin-top: 2rem;
   display: flex;
-  gap: 1rem;
+  gap: 5px;
 
   .call-button,
   .inquire-button {
@@ -78,25 +72,34 @@ export const ButtonStyled = styled.div`
     font-weight: 500;
     border-radius: 8px;
     cursor: pointer;
+    width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    column-gap: 5px;
   }
 
   .call-button {
-    background-color: #28a745;
+    background-color: #e73a5d;
     color: white;
   }
 
   .inquire-button {
-    background-color: #007bff;
+    background-color: #e73a5d;
     color: white;
   }
 `;
 
 // Title Section (Description)
 export const TitleSectionStyled = styled.div`
-  margin-top: 2rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
 
   h2 {
     font-size: 22px;
+    margin-top: 0.5rem;
     margin-bottom: 1rem;
     color: #222;
   }
@@ -105,29 +108,39 @@ export const TitleSectionStyled = styled.div`
     font-size: 16px;
     color: #555;
     line-height: 1.6;
+    text-align: start;
   }
+`;
+
+export const ImageSectionWrapperStyled = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 auto;
+  width: 100%;
 `;
 
 // Image Section (Main + Small Images)
 export const ImageSectionStyled = styled.div`
   display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+
   gap: 1rem; // Add this to control spacing between main and small images
 
   .main-image-wrapper {
     flex: 3;
     cursor: pointer;
+    height: 500px;
 
     img {
       width: 100%; // Change from 50vw to 100% to fill the container
-      height: 90%;
-      object-fit: cover;
+      height: 100%;
       border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease;
-
-      &:hover {
-        transform: scale(1.05);
-      }
+      inset: 0px;
+      object-fit: cover;
     }
   }
 
@@ -139,19 +152,15 @@ export const ImageSectionStyled = styled.div`
 
     .small-image {
       cursor: pointer;
+      height: 240px;
 
       img {
         width: 100%;
-        height: 90%;
+        height: 100%;
         object-fit: cover;
         border-radius: 8px;
+        inset: 0px;
         border: 1px solid #ddd;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease;
-
-        &:hover {
-          transform: scale(1.05);
-        }
       }
     }
   }
@@ -161,8 +170,9 @@ export const CustomCarouselStyled = styled.div`
   .slick-slide img {
     width: 100%;
     height: 400px;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 8px;
+    inset: 0;
   }
 
   .slick-arrow {
@@ -172,17 +182,95 @@ export const CustomCarouselStyled = styled.div`
     height: 40px;
     border-radius: 50%;
 
-    &:before {
-      font-size: 20px;
-      color: white;
+    &:after {
+      top: 38%;
+      left: 38%;
+      right: 38%;
     }
   }
+`;
 
-  .slick-prev {
-    left: -50px; /* Adjust as needed */
+export const TypeOfPropertyStyled = styled.div`
+  width: 13px;
+  height: 13px;
+  margin: auto 5px auto 20px;
+  background-color: rgb(232, 84, 81);
+  border-radius: 2.86px;
+`;
+
+export const FetaureSectionStyled = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+
+  .property-features {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    flex-wrap: wrap;
   }
 
-  .slick-next {
-    right: -50px; /* Adjust as needed */
+  .feature-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    margin-left: 5px;
+    margin-right: 5px;
+    width: 150.5px;
+    height: 109.78px;
+    border-radius: 12px;
+    background: rgba(242, 242, 242, 0.5);
+    opacity: 0.8;
+    position: relative;
+    border: hidden;
+    color: #737678;
+
+    .icon {
+      width: 50px;
+      height: 50px;
+
+      svg {
+        width: 100%;
+        height: 100%;
+
+        path {
+          fill: #737678;
+        }
+      }
+
+      &.mos {
+        svg {
+          path {
+            stroke: #737678;
+          }
+        }
+      }
+    }
   }
+`;
+
+export const DiscountLabelStyled = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 5px;
+  opacity: 0.8;
+  position: relative;
+  border: hidden;
+  color: #e95144;
+`;
+
+export const RentStyled = styled.div`
+  font-size: 18px;
+  font-weight: bold;
+  display: inline-block;
+
+  text-decoration: ${({ isDiscounted }) =>
+    isDiscounted ? "line-through" : ""};
 `;

@@ -1,3 +1,4 @@
 import Home from "./home";
+import LikedProperties from "./likedproperties";
 
-export { Home };
+export { Home, LikedProperties };

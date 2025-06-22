@@ -1,65 +1,5 @@
 import styled from "styled-components";
 
-export const NavbarContainer = styled.nav`
-  background-color: white;
-  color: #e0e1dd;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  flex-wrap: wrap;
-`;
-
-export const LeftSectionContainer = styled.nav`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  // margin-right: 10rem;
-`;
-
-export const Logo = styled.h1`
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #ffffff;
-  cursor: pointer;
-  padding-left: 5rem;
-  color: #e85451;
-`;
-
-export const NavLinks = styled.div`
-  display: flex;
-  column-gap: 2rem;
-  flex-wrap: wrap;
-  color: #37474f;
-  font-weight: bold;
-  font-size: 16px;
-  margin: 8px 0px 0 30px;
-`;
-
-export const NavItem = styled.div`
-  cursor: pointer;
-`;
-
-export const SignInButton = styled.button`
-  background-color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  display: flex;
-  align-items: center;
-  border-radius: 8px;
-  gap: 0.5rem;
-  cursor: pointer;
-  color: #37474f;
-  font-weight: bold;
-  font-size: 14px;
-  border: 1px solid black;
-  border-radius: 30px;
-  margin-right: 5rem;
-  &:hover {
-    background-color: #e85451;
-    color: white;
-  }
-`;
 // Footer.styles.jsx
 
 const colors = {
@@ -224,7 +164,6 @@ export const ArrowIcon = styled.div`
   font-size: 14px;
 `;
 
-export const ImageWrapper = styled.div``;
 // components/BackgroundImage.styles.jsx
 
 export const BackgroundSection = styled.section`
@@ -288,49 +227,5 @@ export const SearchButton = styled.button`
 
   &:hover {
     background-color: #b20710;
-  }
-`;
-
-export const InfoSectionStyled = styled.div`
-  padding: 15px;
-  align-items: flex-start;
-  display: flex;
-  flex-direction: column;
-  row-gap: 7px;
-
-  .price {
-    font-weight: 600;
-  }
-
-  .type {
-    font-weight: normal;
-    color: rgb(55, 71, 79);
-  }
-
-  .amenties-section {
-    display: flex;
-    column-gap: 20px;
-    align-items: center;
-
-    .amenity {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      width: max-content;
-
-      .count {
-        font-size: 10px;
-      }
-    }
-  }
-
-  .title,
-  .desc {
-    font-weight: normal;
-    color: rgb(55, 71, 79);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 100%;
   }
 `;

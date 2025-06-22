@@ -17,9 +17,7 @@ const MoreActions = (props) => {
   const { propertyId } = props || {};
   const navigate = useNavigate();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const onViewClick = () => {
-    navigate(`/listing/${propertyId}`); // Navigate to the ListingDetail page with the property ID
-  };
+
   const onEditClick = () => {
     navigate("/edit-property/" + propertyId);
   };
@@ -39,18 +37,20 @@ const MoreActions = (props) => {
     setIsModalVisible(false); // Close the modal without submission
   };
 
+  const onViewClick = () => {
+    navigate(`/listing/${propertyId}`); // Navigate to the ListingDetail page with the property ID
+  };
+
   return (
     <div className="more-actions">
       <MoreActionItemStyled onClick={onViewClick}>View</MoreActionItemStyled>
+
       <MoreActionItemStyled onClick={onEditClick}>Edit</MoreActionItemStyled>
       <MoreActionItemStyled onClick={onDuplicateClick}>
         Duplicate Property
       </MoreActionItemStyled>
       <MoreActionItemStyled onClick={onMarkInactiveClick}>
         Mark As In-Active
-      </MoreActionItemStyled>
-      <MoreActionItemStyled onClick={onMarkInactiveClick}>
-        View
       </MoreActionItemStyled>
 
       <SetAsInActiveModal

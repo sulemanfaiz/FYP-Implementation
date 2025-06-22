@@ -9,7 +9,6 @@ const verifyToken = (req, res, next) => {
         return res.status(403).json({ message: "Token is invalid" });
       }
 
-      console.log("verifyToken user", user);
       req.user = user; //  Now req.user will be available
       next();
     });
@@ -18,4 +17,24 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-module.exports = verifyToken;
+const safeVerifyToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+    if (!token) return next();
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) {
+        next();
+      }
+
+      req.user = user; //  Now req.user will be available
+      next();
+    });
+  } else {
+    next();
+  }
+};
+
+module.exports = { verifyToken, safeVerifyToken };

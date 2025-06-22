@@ -1,9 +1,10 @@
 import {
+  FormInputWrapperStyled,
   LeftSectionStyled,
   RightSectionStyled,
-  SignupPageStyled,
   SignupContainerStyled,
-  FormInputWrapperStyled,
+  SignupFormStyled,
+  SignupPageStyled,
   SignupWrapperStyled,
 } from "./signupstyle";
 
@@ -13,21 +14,16 @@ import { useCallback } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupFormSchema } from "../../schema/signupschema";
 import { useNavigate } from "react-router-dom";
-import { FaHouse } from "react-icons/fa6";
-import styled from "styled-components";
-
-const HouseIcon = styled(FaHouse)`
-  color: white;
-  font-size: 48px;
-  margin-bottom: 20px;
-`;
+import { useToast } from "../../hooks/useToast"; // ✅ Import hook
+import { EyeTwoTone, EyeInvisibleOutlined } from "@ant-design/icons";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { showSuccess, showError, showLoading, dismiss } = useToast(); // ✅ Use methods
 
   const {
     control,
-    formState: { isValid },
+    formState: { isValid, errors },
     handleSubmit,
   } = useForm({
     defaultValues: {
@@ -40,25 +36,45 @@ const SignUp = () => {
     resolver: yupResolver(signupFormSchema),
   });
 
-  const onSubmit = useCallback(async (values) => {
-    try {
-      const response = await fetch(`http://localhost:8080/auth/signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-      const result = await response.json();
-      const { success } = result;
-      if (success) {
-        localStorage.setItem("token", result.jwtToken);
-        navigate("/my-properties");
+  const onSubmit = useCallback(
+    async (values) => {
+      localStorage.removeItem("token");
+
+      const toastId = showLoading("Creating your account..."); // ✅ loading
+
+      try {
+        const response = await fetch("http://localhost:8080/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        });
+
+        const result = await response.json();
+        dismiss(toastId); // ✅ stop loading
+
+        const { success, message, error, jwtToken } = result;
+
+        if (success) {
+          showSuccess("🎉 Signup successful! Welcome to Kiraya Pa");
+          localStorage.setItem("token", jwtToken);
+          setTimeout(() => navigate("/my-properties"), 1500);
+        } else if (error) {
+          const details =
+            error?.details?.[0]?.message || message || "Signup failed.";
+          showError(`❌ ${details}`);
+        } else {
+          showError("❌ Unknown error occurred. Please try again.");
+        }
+      } catch (err) {
+        dismiss(toastId); // in case of crash
+        console.error("Signup error:", err);
+        showError(
+          "🔌 Could not connect to the server. Please check your internet."
+        );
       }
-    } catch (err) {
-      console.log("Error", err);
-    }
-  }, []);
+    },
+    [navigate, showSuccess, showError, showLoading, dismiss]
+  );
 
   return (
     <SignupPageStyled>
@@ -78,6 +94,7 @@ const SignUp = () => {
           </p>
 
           <SignupContainerStyled>
+            {/* Name Field */}
             <FormInputWrapperStyled>
               <div className="form-row">
                 <div className="label">Name</div>
@@ -95,6 +112,7 @@ const SignUp = () => {
               </div>
             </FormInputWrapperStyled>
 
+            {/* Email Field */}
             <FormInputWrapperStyled>
               <div className="form-row">
                 <div className="label">Email</div>
@@ -112,6 +130,7 @@ const SignUp = () => {
               </div>
             </FormInputWrapperStyled>
 
+            {/* Password Field */}
             <FormInputWrapperStyled>
               <div className="form-row">
                 <div className="label">Password</div>
@@ -119,17 +138,21 @@ const SignUp = () => {
                   control={control}
                   name="password"
                   render={({ field }) => (
-                    <Input
+                    <Input.Password
                       {...field}
                       placeholder="Password"
                       className="input-field"
-                      type="password"
+                      // 👇 custom icons ↴
+                      iconRender={(visible) =>
+                        visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                      }
                     />
                   )}
                 />
               </div>
             </FormInputWrapperStyled>
 
+            {/* Mobile Field */}
             <FormInputWrapperStyled>
               <div className="form-row">
                 <div className="label">Mobile</div>
@@ -147,11 +170,22 @@ const SignUp = () => {
               </div>
             </FormInputWrapperStyled>
 
-            <Button onClick={handleSubmit(onSubmit)} className="signup-button">
+            {/* Signup Button */}
+            <Button
+              onClick={handleSubmit(onSubmit)}
+              className="signup-button"
+              type="primary"
+              disabled={!isValid}
+            >
               Sign Up
             </Button>
 
-            <Button onClick={() => navigate("/login")} className="text-button">
+            {/* Navigate to Login */}
+            <Button
+              onClick={() => navigate("/login")}
+              className="text-button"
+              type="default"
+            >
               Already have an account? Login
             </Button>
           </SignupContainerStyled>

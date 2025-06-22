@@ -14,15 +14,26 @@ import {
   TitleSectionStyled,
   ImageSectionStyled,
   CustomCarouselStyled,
+  ListingStyled,
+  ImageSectionWrapperStyled,
+  TypeOfPropertyStyled,
+  FetaureSectionStyled,
+  DiscountLabelStyled,
+  RentStyled,
 } from "./listingdetailstyles";
+import { Header } from "../../components";
+import {
+  areaSizeOptions,
+  propertyOptions,
+} from "../addlisting/addlisting.config";
+import { getFeatureIcon } from "./listingdetail.util";
 
 const API_URL = process.env.REACT_APP_API_URL; // Replace with your actual API URL
 console.log("API URL:", API_URL);
 
 const ListingDetail = () => {
   const { id } = useParams();
-  console.log("Property ID:", id); // Get the property ID from the URL
-  console.log("API Endpoint:", `${API_URL}/properties/${id}`);
+
   const [property, setProperty] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -68,108 +79,182 @@ const ListingDetail = () => {
   }
   console.log("Rendering property data: ", property);
 
-  return (
-    <ListingWrapperStyled>
-      {/* Image Section */}
-      {/* Image Section */}
-      <ImageSectionStyled>
-        {/* Main Image */}
-        <div className="main-image-wrapper" onClick={() => openSlider(0)}>
-          <img
-            src={`${API_URL}/uploads/${property?.fileNames?.[0]}`}
-            alt="Main Property"
-          />
-        </div>
+  const propertyTypeText =
+    propertyOptions?.find((prop) => prop.value === property?.propertyType)
+      ?.label || "";
 
-        {/* Smaller Images */}
-        <div className="small-images-wrapper">
-          {property?.fileNames?.slice(1, 3).map((path, index) => (
-            <div
-              key={index}
-              className="small-image"
-              onClick={() => openSlider(index + 1)}
-            >
+  const propertyAreaText =
+    areaSizeOptions?.find((prop) => prop.value === property?.areaSizeMetric)
+      ?.label || "";
+
+  console.log("property", property);
+
+  const calculateDiscountedPrice = (originalPrice, discountPercent) => {
+    const discountAmount = (originalPrice * discountPercent) / 100;
+    return originalPrice - discountAmount;
+  };
+
+  return (
+    <ListingStyled>
+      <Header />
+
+      <ListingWrapperStyled>
+        <ImageSectionWrapperStyled className="ImageSectionWrapperStyled">
+          <ImageSectionStyled className="ImageSectionStyled">
+            {/* Main Image */}
+            <div className="main-image-wrapper" onClick={() => openSlider(0)}>
               <img
-                src={`${API_URL}/uploads/${path}`}
-                alt={`Property ${index}`}
+                src={`${API_URL}/uploads/${property?.fileNames?.[0]}`}
+                alt="Main Property"
               />
             </div>
-          ))}
-        </div>
-      </ImageSectionStyled>
 
-      {/* Modal for Image Slider */}
-      <Modal
-        visible={isModalVisible}
-        footer={null}
-        onCancel={closeSlider}
-        centered
-        width={800}
-      >
-        <CustomCarouselStyled>
-          <Carousel initialSlide={currentSlide} dots arrows>
-            {property?.fileNames?.map((path, index) => (
-              <div key={index}>
-                <img
-                  src={`${API_URL}/uploads/${path}`}
-                  alt={`Property Image ${index}`}
-                />
+            {/* Smaller Images */}
+            <div className="small-images-wrapper">
+              {property?.fileNames?.slice(1, 3).map((path, index) => (
+                <div
+                  key={index}
+                  className="small-image"
+                  onClick={() => openSlider(index + 1)}
+                >
+                  <img
+                    src={`${API_URL}/uploads/${path}`}
+                    alt={`Property ${index}`}
+                  />
+                </div>
+              ))}
+            </div>
+          </ImageSectionStyled>
+        </ImageSectionWrapperStyled>
+
+        {/* Modal for Image Slider */}
+        <Modal
+          visible={isModalVisible}
+          footer={null}
+          onCancel={closeSlider}
+          centered
+          width={800}
+        >
+          <CustomCarouselStyled>
+            <Carousel initialSlide={currentSlide} dots arrows>
+              {property?.fileNames?.map((path, index) => (
+                <div key={index}>
+                  <img
+                    src={`${API_URL}/uploads/${path}`}
+                    alt={`Property Image ${index}`}
+                  />
+                </div>
+              ))}
+            </Carousel>
+          </CustomCarouselStyled>
+        </Modal>
+        {/* Property Details Section */}
+        <ListingDetailWrapperStyled>
+          <DetailCardStyled>
+            <DiscountLabelStyled>
+              🏷️
+              {property?.discountLabel} - {property?.discountPercentage}% Off
+            </DiscountLabelStyled>
+
+            <div className="name-price-wrapper">
+              <div className="property-name">{property?.title}</div>
+
+              <ButtonStyled>
+                <button className="call-button">
+                  <IoIosCall /> Call
+                </button>
+                <button className="inquire-button">
+                  <CiMail /> Inquire
+                </button>
+              </ButtonStyled>
+            </div>
+
+            <div className="icons-wrapper">
+              <div className="icon-item">
+                <IoBedOutline /> {property?.bedrooms} Bedrooms
               </div>
-            ))}
-          </Carousel>
-        </CustomCarouselStyled>
-      </Modal>
-      {/* Property Details Section */}
-      <ListingDetailWrapperStyled>
-        <DetailCardStyled>
-          <div className="name-price-wrapper">
-            <div className="property-name">
-              {console.log("Title:", property?.title)}
-              {property?.title}
+              <div className="icon-item">
+                <FaBath /> {property?.bathrooms} Bathrooms
+              </div>
+              <div className="icon-item">
+                <IoIosResize /> {property?.areaSizeUnit} {propertyAreaText}
+              </div>
+              <div className="icon-item">
+                <TypeOfPropertyStyled />
+                {propertyTypeText}
+              </div>
             </div>
-            <div className="property-rent">
-              <div className="rent">PKR {property?.rent}</div>
 
-              <div className="month">/ month</div>
+            <div className="icons-wrapper">
+              <div className="icon-item">
+                <RentStyled
+                  isDiscounted={property?.isDiscountEnabled === "true"}
+                >
+                  PKR {property?.rent}/Month
+                </RentStyled>
+              </div>
             </div>
-          </div>
+          </DetailCardStyled>
 
-          <div className="icons-wrapper">
-            <div className="icon-item">
-              <IoBedOutline /> {property?.bedrooms} Bedrooms
+          <Divider />
+
+          <TitleSectionStyled>
+            <h2> Discount Details</h2>
+            <div className="property-description">
+              💸 {property?.discountPercentage}% Off
             </div>
-            <div className="icon-item">
-              <FaBath /> {property?.bathrooms} Bathrooms
+
+            <div className="property-description">
+              Validity:{"   "} {property?.discountStartDate} to{" "}
+              {property?.discountEndDate}
+              <br />
+              Discounted Price: {"   "}
+              <RentStyled>
+                PKR{" "}
+                {calculateDiscountedPrice(
+                  property?.rent,
+                  property?.discountPercentage
+                )}
+                /Month
+              </RentStyled>
             </div>
-            <div className="icon-item">
-              <IoIosResize /> {property?.areaSizeUnit}
-              {property?.areaSizeMetric}{" "}
+          </TitleSectionStyled>
+
+          <Divider />
+
+          {/* <ButtonStyled>
+            <button className="call-button">
+              <IoIosCall /> Call
+            </button>
+            <button className="inquire-button">
+              <CiMail /> Inquire
+            </button>
+          </ButtonStyled> */}
+
+          {/* Description */}
+          <TitleSectionStyled>
+            <h2>Description</h2>
+            <div className="property-description">
+              {property?.desc || "No description available for this property."}
             </div>
-            <div className="icon-item">{property?.propertyType}</div>
-          </div>
-        </DetailCardStyled>
-
-        <ButtonStyled>
-          <button className="call-button">
-            <IoIosCall /> Call
-          </button>
-          <button className="inquire-button">
-            <CiMail /> Inquire
-          </button>
-        </ButtonStyled>
-
-        {/* Divider */}
-        <Divider />
-
-        {/* Description */}
-        <TitleSectionStyled>
-          <h2>Description</h2>
-          <div className="property-description">
-            {property?.desc || "No description available for this property."}
-          </div>
-        </TitleSectionStyled>
-      </ListingDetailWrapperStyled>
-    </ListingWrapperStyled>
+          </TitleSectionStyled>
+          <Divider />
+          <FetaureSectionStyled>
+            <h2>Features</h2>
+            <div className="property-features">
+              {property?.features?.map((feature, index) => (
+                <div key={index} className="feature-item">
+                  <div className={`icon ${feature?.key?.toLowerCase()}`}>
+                    {getFeatureIcon(feature?.key)}
+                  </div>
+                  {feature?.label}: {feature?.count}
+                </div>
+              ))}
+            </div>
+          </FetaureSectionStyled>
+        </ListingDetailWrapperStyled>
+      </ListingWrapperStyled>
+    </ListingStyled>
   );
 };
 

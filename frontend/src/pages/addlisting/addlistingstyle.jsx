@@ -100,6 +100,15 @@ export const FormInputWrapperStyled = styled.div`
     margin-bottom: 15px;
   }
 
+  .ant-switch {
+    margin-left: 25px;
+
+    &.ant-switch-checked,
+    &.ant-switch-checked:hover {
+      background-color: #e85451;
+    }
+  }
+
   .inputs-container {
     display: flex;
     column-gap: 10px;
@@ -131,6 +140,14 @@ export const FormInputWrapperStyled = styled.div`
 
   .textarea-field {
     width: 550px;
+  }
+
+  .add-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #e85451;
+    cursor: pointer;
   }
 `;
 
