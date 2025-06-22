@@ -8,16 +8,22 @@ import Login from "./pages/login/login";
 import SignUp from "./pages/signup/signup";
 import MyProperties from "./pages/myproperties";
 import MyProperty from "./pages/myproperty";
+
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LandingPage from "./pages/landingpage/landingpage";
 import Home from "./pages/home/home";
-import { LikedProperties } from "./pages";
-import ToastProvider from "./components/toast componenet/ToastProvider.jsx"; // Import your ToastProvider
+import {
+  AboutUs,
+  LikedProperties,
+  SmartPredictionForm,
+  SearchPage,
+} from "./pages";
+import Toast from "./components/toast/toast";
 
 function App() {
   return (
     <Router>
-      <ToastProvider>
+      <Toast>
         <div className="App">
           <Routes>
             <Route path="/" element={<LandingPage />} />
@@ -36,11 +42,15 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/listing/:id" element={<ListingDetail />} />
             <Route path="/my-properties" element={<MyProperties />} />
+            <Route path="/my-properties" element={<MyProperties />} />
             <Route path="/liked-properties" element={<LikedProperties />} />
             <Route path="/my-properties/:id" element={<MyProperty />} />
+            <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/smart-rent-ai" element={<SmartPredictionForm />} />
+            <Route path="/search/:query" element={<SearchPage />} />
           </Routes>
         </div>
-      </ToastProvider>
+      </Toast>
     </Router>
   );
 }

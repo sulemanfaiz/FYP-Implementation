@@ -44,7 +44,6 @@ const Login = () => {
   const onSubmit = useCallback(
     async (values) => {
       setIsLoading(true);
-      const loadingId = showLoading("Logging you in…");
 
       try {
         const response = await fetch("http://localhost:8080/auth/login", {
@@ -52,8 +51,6 @@ const Login = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(values),
         });
-
-        dismiss(loadingId); // stop spinner
 
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const { success, message, error, jwtToken, name, email } =
@@ -68,27 +65,8 @@ const Login = () => {
           setTimeout(() => navigate("/my-properties"), 1500);
           return;
         }
-
-        // server‑side validation errors
-        if (error?.details?.length) {
-          showError(`❌ Login Failed: ${error.details[0].message}`);
-        } else {
-          showError(`❌ Login Failed: ${message ?? "Invalid credentials."}`);
-        }
       } catch (err) {
-        dismiss(loadingId); // just in case
-        // Map common errors → friendly copy
-        const friendly = {
-          ["HTTP 401"]: "🔐 Invalid credentials. Please try again.",
-          ["HTTP 404"]: "🔍 Service not found. Contact support.",
-          ["HTTP 429"]: "⏰ Too many attempts. Please wait and retry.",
-          ["HTTP 500"]: "⚠️ Server error. Try again later.",
-          TypeError: "🌐 Network error. Check your connection.",
-        };
-
-        const key = err.name === "TypeError" ? "TypeError" : err.message;
-        showError(friendly[key] ?? "🔌 Unable to connect. Try again later.");
-        console.error("Login error:", err);
+        showError("Login Failed!!. Please enter valid credentials");
       } finally {
         setIsLoading(false);
       }
@@ -102,7 +80,7 @@ const Login = () => {
       {/* Left section (branding) */}
       <LeftSectionStyled>
         <div className="content">
-          <img src="/Kiraya pa logo.png" alt="Logo" className="logo" />
+          <img src="/KirayaPeLogo.png" alt="Logo" className="logo" />
           <h1 className="welcome-heading">Welcome to Kiraya Pa</h1>
           <p className="tagline">Rent Smart, Live Better.</p>
         </div>

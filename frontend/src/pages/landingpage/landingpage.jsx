@@ -1,17 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  FooterContainer,
-  FooterSection,
-  FooterHeading,
-  FooterLink,
-  FooterContactItem,
-  SocialIcons,
-  SocialIcon,
-  BottomBar,
-  Copyright,
-  MadeWithLove,
-} from "./landingpage.styles";
-import {
   FaInstagram,
   FaLinkedin,
   FaTwitter,
@@ -39,7 +27,7 @@ import {
 } from "../addlisting/addlisting.config";
 import { useNavigate } from "react-router-dom";
 import { Button, Popover } from "antd";
-import { Header, ProfileMenu } from "../../components";
+import { Footer, Header, ProfileMenu } from "../../components";
 
 const cities = cityOptions;
 const propertySizes = areaSizeOptions;
@@ -55,6 +43,8 @@ const LandingPage = () => {
   const [filterByCity, setFilterByCity] = React.useState("all");
   const [filterBySize, setFilterBySize] = React.useState("all");
   const [filterByType, setFilterByType] = React.useState("all");
+
+  const [searchText, setSearchText] = React.useState("");
 
   const [filteredListingsByCity, setFilteredListingsByCity] = useState([]);
   const [filteredListingsBySize, setFilteredListingsBySize] = useState([]);
@@ -103,7 +93,6 @@ const LandingPage = () => {
       const { success, message, error } = result;
       if (success) {
         const listings = result.listings || [];
-        console.log("listings", listings);
         setListings(listings);
         setFilteredListingsByCity(listings);
         setFilteredListingsBySize(listings);
@@ -124,6 +113,10 @@ const LandingPage = () => {
 
   const content = <ProfileMenu />;
 
+  const onSearchQueryChange = (value) => {
+    setSearchText(value);
+  };
+
   return (
     <div>
       <Header />
@@ -136,8 +129,12 @@ const LandingPage = () => {
             <SearchInput
               type="text"
               placeholder="Search by city, area, or property..."
+              onChange={(e) => onSearchQueryChange(e?.target?.value)}
             />
-            <SearchButton aria-label="Search">
+            <SearchButton
+              aria-label="Search"
+              onClick={() => navigate(`/search/${searchText}`)}
+            >
               <FiSearch />
             </SearchButton>
           </SearchContainer>
@@ -168,91 +165,7 @@ const LandingPage = () => {
         properties={filteredListingsByType}
       />
 
-      <FooterContainer>
-        <FooterSection>
-          <FooterHeading>About Us</FooterHeading>
-          <FooterLink href="/our-story">Our Story</FooterLink>
-          <FooterLink href="/our-blog">Our Blog</FooterLink>
-          <FooterLink href="/careers">Careers</FooterLink>
-          <FooterLink href="/gurus">Gurus</FooterLink>
-        </FooterSection>
-
-        <FooterSection>
-          <FooterHeading>Contact Us</FooterHeading>
-          <FooterContactItem>
-            <MdEmail size={16} />
-            <span>info@graana.com</span>
-          </FooterContactItem>
-          <FooterContactItem>
-            <MdPhone size={16} />
-            <span>111-555-555</span>
-          </FooterContactItem>
-        </FooterSection>
-
-        <FooterSection>
-          <FooterHeading>Help & Support</FooterHeading>
-          <FooterLink href="/help-center">Help Center</FooterLink>
-          <FooterLink href="/faqs">FAQs</FooterLink>
-          <FooterLink href="/support">Support</FooterLink>
-        </FooterSection>
-
-        <FooterSection>
-          <FooterHeading>Terms of Use</FooterHeading>
-          <FooterLink href="/privacy-policy">Privacy Policy</FooterLink>
-          <FooterLink href="/terms-conditions">Terms & Conditions</FooterLink>
-          <FooterLink href="/cookies">Cookies</FooterLink>
-        </FooterSection>
-
-        <FooterSection>
-          <FooterHeading>Follow Us</FooterHeading>
-          <SocialIcons>
-            <SocialIcon
-              href="https://instagram.com/graana"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaInstagram />
-            </SocialIcon>
-            <SocialIcon
-              href="https://linkedin.com/company/graana"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaLinkedin />
-            </SocialIcon>
-            <SocialIcon
-              href="https://twitter.com/graana"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaTwitter />
-            </SocialIcon>
-            <SocialIcon
-              href="https://youtube.com/graana"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaYoutube />
-            </SocialIcon>
-            <SocialIcon
-              href="https://facebook.com/graana"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaFacebook />
-            </SocialIcon>
-          </SocialIcons>
-        </FooterSection>
-
-        <BottomBar>
-          <Copyright>
-            © {new Date().getFullYear()} Kiraya pe. All Rights Reserved.
-          </Copyright>
-          <MadeWithLove>
-            Made with <FaHeart color="#E73A5D" /> by Us
-          </MadeWithLove>
-        </BottomBar>
-      </FooterContainer>
+      <Footer />
     </div>
   );
 };

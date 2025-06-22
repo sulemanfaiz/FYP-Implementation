@@ -1,38 +1,64 @@
 const ListingModel = require("../models/listing");
 const LikedListingModel = require("../models/likedlisting");
 
-const addlisting = async (req, res) => {
+const addListing = async (req, res) => {
   try {
-    const imagePaths = req.files.map((file) => file.path);
-    const imageFileNames = req.files.map((file) => file.filename);
     const userId = req.user._id;
+    const imagePaths = req?.files?.map((file) => file?.path) || [];
+    const imageFileNames = req.files?.map((file) => file?.filename) || [];
 
-    const isDraft = req.body.isDraft === "true" ? true : false;
+    const isDraft = req?.body?.isDraft === "true";
 
-    const propertyFeatures = JSON.parse(req.body.features);
+    // Optional JSON-parsed features
+    let propertyFeatures = [];
+    try {
+      propertyFeatures = req.body.features ? JSON.parse(req.body.features) : [];
+    } catch (e) {
+      console.warn("Invalid features format", e);
+    }
 
     const listingData = {
-      ...req.body,
-      fileNames: imageFileNames, // Save file path in DB
-      paths: imagePaths, // Save file path in DB
-      userId: userId,
+      propertyType: req.body.propertyType,
+      city: req.body.city,
+      areaSizeUnit: req.body.areaSizeUnit,
+      areaSizeMetric: req.body.areaSizeMetric,
+      rent: req.body.rent,
+      bedrooms: req.body.bedrooms,
+      bathrooms: req.body.bathrooms,
+      title: req.body.title,
+      adress: req.body.adress,
+      garages: req.body.garages,
+
+      houseNo: req.body.houseNo || "",
+      yearBuilt: req.body.yearBuilt || "",
+      desc: req.body.desc || "",
+
+      paths: imagePaths,
+      fileNames: imageFileNames,
+      userId,
+
+      comment: req.body.comment || "",
+      reason: req.body.reason || "",
+
       status: isDraft ? "DFT" : "ACT",
       features: propertyFeatures,
+
+      isDiscountEnabled: req.body.isDiscountEnabled === "true",
+      discountStartDate: req.body.discountStartDate,
+      discountEndDate: req.body.discountEndDate,
+      discountPercentage: req.body.discountPercentage,
+      discountLabel: req.body.discountLabel,
     };
 
-    const listingModel = new ListingModel(listingData);
+    const listing = new ListingModel(listingData);
+    await listing.save();
 
-    await listingModel.save();
-    res.status(201).json({
-      message: "Listing added successfully",
-      success: true,
-    });
+    res
+      .status(201)
+      .json({ success: true, message: "Listing added successfully" });
   } catch (err) {
-    console.log("add listing controller error", err);
-    res.status(500).json({
-      message: "Internal server errror",
-      success: false,
-    });
+    console.error("add listing controller error", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -205,11 +231,96 @@ const markListingAsInactive = async (req, res) => {
   }
 };
 
+const searchListings = async (req, res) => {
+  const query = req.query.q;
+
+  if (!query) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Search query is required" });
+  }
+
+  try {
+    const regex = new RegExp(query, "i"); // case-insensitive regex
+
+    const listings = await ListingModel.find({
+      $or: [
+        { city: regex },
+        { adress: regex },
+        { title: regex },
+        { desc: regex },
+      ],
+    });
+
+    res.status(200).json({ success: true, listings });
+  } catch (error) {
+    console.error("Search error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const detailedFilterListings = async (req, res) => {
+  try {
+    const {
+      q,
+      propertyType,
+      bedroomCount,
+      bathroomCount,
+      plotSizeMin,
+      plotSizeMax,
+      plotSizeUnit,
+    } = req.query;
+
+    const filter = {};
+
+    if (q) {
+      const regex = new RegExp(q, "i");
+      filter.$or = [
+        { city: regex },
+        { adress: regex },
+        { title: regex },
+        { desc: regex },
+      ];
+    }
+
+    if (propertyType) {
+      filter.propertyType = propertyType;
+    }
+
+    if (bedroomCount) {
+      filter.bedrooms = parseInt(bedroomCount);
+    }
+
+    if (bathroomCount) {
+      filter.bathrooms = parseInt(bathroomCount);
+    }
+
+    if (plotSizeMin || plotSizeMax) {
+      filter.areaSizeUnit = {};
+      if (plotSizeMin) filter.areaSizeUnit.$gte = parseFloat(plotSizeMin);
+      if (plotSizeMax) filter.areaSizeUnit.$lte = parseFloat(plotSizeMax);
+    }
+
+    if (plotSizeUnit) {
+      filter.areaSizeMetric = plotSizeUnit.toLowerCase(); // normalize casing
+    }
+
+    const listings = await ListingModel.find(filter);
+
+    res.status(200).json({ success: true, listings });
+  } catch (error) {
+    console.error("Filter search error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 module.exports = {
-  addlisting,
+  addListing,
   editListing,
   getListing,
   getListingDetail,
   getAllListings,
   markListingAsInactive,
+  searchListings,
+  detailedFilterListings,
 };

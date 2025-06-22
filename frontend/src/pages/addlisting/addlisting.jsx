@@ -2,15 +2,17 @@ import {
   AddListingFormContainerStyled,
   AddListingFormStyled,
   AddListingPageStyled,
+  AddListingPageWrapperStyled,
   AddListingWrapperStyled,
   BannerWrapperStyled,
+  ColumnFlexStyled,
   FormButtonWrapperStyled,
   FormInputWrapperStyled,
   ImagesWrapperStyled,
   ImageWrapperStyled,
 } from "./addlistingstyle";
-import { useToast } from "../../hooks/useToast";
-import { Input, Select } from "antd";
+
+import { Input, Select, Tooltip } from "antd";
 import { Switch } from "antd";
 
 import { useForm, Controller } from "react-hook-form";
@@ -34,14 +36,18 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import AddAmenitiesModal from "../addamenitiesmodal";
 import Header from "../../components/header/header";
-import ToastProvider from "../../components/toast componenet/ToastProvider";
+import { Footer } from "../../components";
+import { addListingSchema } from "./addlistingschema";
+import { useToast } from "../../hooks/useToast";
 
 const AddListingContent = (props) => {
+  const { showSuccess, showError, showLoading } = useToast(); // ✅ Use methods
+
   const [isFeatureModalVisible, setIsFeatureModalVisible] = useState(false);
 
   const { isEditMode, isDuplicateMode, property } = props || {};
   const navigate = useNavigate();
-  const { showSuccess, showError, showLoading, dismiss } = useToast();
+
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   const listingId = useParams().id;
@@ -67,7 +73,7 @@ const AddListingContent = (props) => {
 
   const {
     control,
-    formState: { isValid },
+    formState: { isValid, errors },
     handleSubmit,
     setValue,
     setError,
@@ -78,7 +84,7 @@ const AddListingContent = (props) => {
       propertyType,
       city: city || undefined,
       areaSizeUnit,
-      areaSizeMetric: areaSizeMetric || undefined,
+      areaSizeMetric: areaSizeMetric || "marla",
       rent,
       bedrooms,
       garages,
@@ -93,8 +99,10 @@ const AddListingContent = (props) => {
       features,
     },
     mode: "onChange",
-    // resolver: yupResolver(signupFormSchema),
+    resolver: yupResolver(addListingSchema),
   });
+
+  console.log("isValid", { isValid, errors });
 
   const {
     images: fileList,
@@ -106,11 +114,10 @@ const AddListingContent = (props) => {
   } = watch();
 
   const onFeatureModalOpen = () => {
-    setIsFeatureModalVisible(true);
+    setIsFeatureModalVisible(true); // Show the modal
   };
-
   const onFeatureModalClose = (data) => {
-    setIsFeatureModalVisible(false);
+    setIsFeatureModalVisible(false); // Close the modal after submission
   };
 
   const onFeaturesSaved = (data) => {
@@ -118,141 +125,123 @@ const AddListingContent = (props) => {
       "features",
       data?.map((f) => ({ key: f.key, label: f.label, count: f.count || 0 }))
     );
+    // Close the modal after submission
     onFeatureModalClose();
   };
 
-  const onSubmitValues = useCallback(
-    async (values, isDraft, isEdited) => {
-      const toastId = showLoading(
-        isEdited
-          ? "Updating listing…"
-          : isDraft
-          ? "Saving draft…"
-          : "Adding listing…"
-      );
-      const {
-        propertyType,
-        city,
-        areaSizeUnit,
-        areaSizeMetric,
-        rent,
-        bedrooms,
-        garages,
-        bathrooms,
-        title,
-        desc,
-        images,
-        yearBuilt,
-        status,
-        adress,
-        houseNo,
-        features = [],
-        isSeasonalDiscount,
-        discountStartDate,
-        discountEndDate,
-        discountPercentage,
-        discountLabel,
-      } = values || {};
+  const onSubmitValues = useCallback(async (values, isDraft, isEdited) => {
+    const {
+      propertyType,
+      city,
+      areaSizeUnit,
+      areaSizeMetric,
+      rent,
+      bedrooms,
+      garages,
+      bathrooms,
+      title,
+      desc,
+      images,
+      yearBuilt,
+      status,
+      adress,
+      houseNo,
+      features = [],
+      isSeasonalDiscount,
+      discountStartDate,
+      discountEndDate,
+      discountPercentage,
+      discountLabel,
+    } = values || {};
 
-      const formData = new FormData();
+    const formData = new FormData();
 
-      images.forEach((file) => {
-        if (file.originFileObj instanceof File) {
-          formData.append("images", file.originFileObj);
-        }
-      });
-
-      const existingImageUrls = images
-        .filter((file) => typeof file === "string" || !file.originFileObj)
-        .map((file) => (typeof file === "string" ? file : file.url));
-
-      formData.append("existingImages", JSON.stringify(existingImageUrls));
-      formData.append("propertyType", propertyType);
-      formData.append("city", city);
-      formData.append("areaSizeUnit", areaSizeUnit);
-      formData.append("areaSizeMetric", areaSizeMetric);
-      formData.append("rent", rent);
-      formData.append("bedrooms", bedrooms);
-      formData.append("bathrooms", bathrooms);
-      formData.append("title", title);
-      formData.append("desc", desc);
-      formData.append("garages", garages);
-      formData.append("yearBuilt", yearBuilt);
-      formData.append("adress", adress);
-      formData.append("houseNo", houseNo);
-      formData.append("isDraft", isDraft);
-      formData.append("features", JSON.stringify(features));
-      formData.append("isDiscountEnabled", isSeasonalDiscount);
-      formData.append("discountStartDate", discountStartDate);
-      formData.append("discountEndDate", discountEndDate);
-      formData.append("discountPercentage", discountPercentage);
-      formData.append("discountLabel", discountLabel);
-
-      const token = localStorage.getItem("token");
-
-      const url = isEdited
-        ? `${API_URL}/listing/edit-listing/${listingId}`
-        : `${API_URL}/listing/add-listing`;
-
-      const method = isEdited ? "PUT" : "POST";
-
-      try {
-        const response = await fetch(url, {
-          method: method,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        });
-        const result = await response.json();
-        dismiss(toastId);
-        const { success, message, error } = result;
-        if (success) {
-          showSuccess(
-            isEdited
-              ? "✅ Listing updated successfully!"
-              : isDraft
-              ? "✅ Draft saved successfully!"
-              : "✅ Listing added successfully!"
-          );
-          navigate("/my-properties");
-        } else if (error) {
-          const msg =
-            error?.details?.[0]?.message || message || "Action failed.";
-          showError(`❌ ${msg}`);
-        }
-      } catch (err) {
-        dismiss(toastId);
-        console.error("catch error", err);
-        showError("❌ Something went wrong. Please try again later.");
+    images.forEach((file) => {
+      if (file.originFileObj instanceof File) {
+        formData.append("images", file.originFileObj);
       }
-    },
-    [API_URL, listingId, navigate, showError, showLoading, showSuccess, dismiss]
-  );
+    });
 
-  const onAdd = useCallback(
-    (values) => {
-      onSubmitValues(values, false, false);
-    },
-    [onSubmitValues]
-  );
+    const existingImageUrls = images
+      .filter((file) => typeof file === "string" || !file.originFileObj)
+      .map((file) => (typeof file === "string" ? file : file.url)); // depends on your structure
 
-  const onSaveAsDraft = useCallback(
-    (values) => {
-      onSubmitValues(values, true, false);
-    },
-    [onSubmitValues]
-  );
+    formData.append("existingImages", JSON.stringify(existingImageUrls));
+    formData.append("propertyType", propertyType);
+    formData.append("city", city);
+    formData.append("areaSizeUnit", areaSizeUnit);
+    formData.append("areaSizeMetric", areaSizeMetric);
+    formData.append("rent", rent);
+    formData.append("bedrooms", bedrooms);
+    formData.append("bathrooms", bathrooms);
+    formData.append("title", title);
+    formData.append("desc", desc);
+    formData.append("garages", garages);
+    formData.append("yearBuilt", yearBuilt);
+    formData.append("adress", adress);
+    formData.append("houseNo", houseNo);
+    formData.append("isDraft", isDraft);
+    formData.append("features", JSON.stringify(features));
+    formData.append("isDiscountEnabled", isSeasonalDiscount);
+    formData.append("discountStartDate", discountStartDate);
+    formData.append("discountEndDate", discountEndDate);
+    formData.append("discountPercentage", discountPercentage);
+    formData.append("discountLabel", discountLabel);
 
-  const onSaveAsEdit = useCallback(
-    (values) => {
-      onSubmitValues(values, false, true);
-    },
-    [onSubmitValues]
-  );
+    const token = localStorage.getItem("token");
+
+    const url = isEdited
+      ? `http://localhost:8080/listing/edit-listing/${listingId}`
+      : "http://localhost:8080/listing/add-listing";
+
+    const method = isEdited ? "PUT" : "POST";
+
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      const result = await response.json();
+
+      const { success, message, error } = result;
+      if (success) {
+        showSuccess(
+          isEdited
+            ? "Property updated successfully!"
+            : isDraft
+            ? "Draft saved successfully!"
+            : "Property added successfully!"
+        );
+        navigate("/my-properties");
+      } else if (error) {
+        const details = error?.details[0].message;
+      }
+    } catch (err) {
+      console.log("catch error", err);
+    }
+  }, []);
+
+  const onAdd = useCallback((values) => {
+    onSubmitValues(values, false);
+  }, []);
+
+  const onSaveAsDraft = useCallback((values) => {
+    onSubmitValues(values, true);
+  }, []);
+
+  const onSaveAsEdit = useCallback((values) => {
+    onSubmitValues(values, false, true);
+  }, []);
 
   const onOptionChange = (name, option) => {
-    setValue(name, option);
+    setValue(name, option, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
   };
 
   const pageTitle = isEditMode
@@ -265,390 +254,454 @@ const AddListingContent = (props) => {
     setValue("isSeasonalDiscount", checked);
   };
 
+  const isFormValid = errors?.length > 0 ? false : true;
+
   return (
     <AddListingPageStyled>
       <Header />
-      <BannerWrapperStyled>
-        <div className="text">{pageTitle}</div>
-        <div className="desc">
-          Get the best value for your property in a few steps.
-        </div>
-      </BannerWrapperStyled>
+      <AddListingPageWrapperStyled>
+        <BannerWrapperStyled>
+          <div className="text">{pageTitle}</div>
+          <div className="desc">
+            Get the best value for your property in a few steps.
+          </div>
+        </BannerWrapperStyled>
 
-      <AddListingWrapperStyled>
-        <AddListingFormContainerStyled>
-          <AddListingFormStyled>
-            <FormInputWrapperStyled>
-              <div className="ques">What kind of property do you have?</div>
+        <AddListingWrapperStyled>
+          <AddListingFormContainerStyled>
+            <AddListingFormStyled>
+              <FormInputWrapperStyled>
+                <div className="ques">
+                  What kind of property do you have?
+                  <span className="error">*</span>
+                </div>
 
-              <ToggleSelect
-                options={propertyOptions}
-                propsOnClick={(value) => onOptionChange("propertyType", value)}
-                selectedValue={propertyTypeWatched}
-              />
-            </FormInputWrapperStyled>
+                <ToggleSelect
+                  options={propertyOptions}
+                  propsOnClick={(value) =>
+                    onOptionChange("propertyType", value)
+                  }
+                  selectedValue={propertyTypeWatched}
+                />
+              </FormInputWrapperStyled>
 
-            <FormInputWrapperStyled>
-              <div className="ques">Which city is your property in?</div>
-              <Controller
-                control={control}
-                name="city"
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    className="select-field"
-                    options={cityOptions}
-                    placeholder="Choose City"
-                  />
-                )}
-              />
-            </FormInputWrapperStyled>
-
-            <FormInputWrapperStyled>
-              <div className="ques">What is your house number?</div>
-              <Controller
-                control={control}
-                name="houseNo"
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    placeholder="Enter House No"
-                    className="input-field"
-                  />
-                )}
-              />
-            </FormInputWrapperStyled>
-
-            <FormInputWrapperStyled>
-              <div className="ques">Which area is your property in?</div>
-              <Controller
-                control={control}
-                name="adress"
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    placeholder="Address, Block, Phase, City etc"
-                    className="input-field"
-                  />
-                )}
-              />
-            </FormInputWrapperStyled>
-
-            <FormInputWrapperStyled>
-              <div className="ques">What is the rent price?</div>
-              <Controller
-                control={control}
-                name="rent"
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    placeholder="Rent"
-                    className="input-field"
-                  />
-                )}
-              />
-            </FormInputWrapperStyled>
-
-            <FormInputWrapperStyled>
-              <div className="ques">What is the size of your property?</div>
-              <div className="inputs-container">
+              <FormInputWrapperStyled>
+                <div className="ques">
+                  Which city is your property in?{" "}
+                  <span className="star">*</span>
+                </div>
                 <Controller
                   control={control}
-                  name="areaSizeUnit"
+                  name="city"
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <Select
+                        {...field}
+                        className="select-field"
+                        options={cityOptions}
+                        placeholder="Choose City"
+                      />
+                      <div className="error">{error?.message}</div>
+                    </>
+                  )}
+                />
+              </FormInputWrapperStyled>
+
+              <FormInputWrapperStyled>
+                <div className="ques">What is your house number?</div>
+                <Controller
+                  control={control}
+                  name="houseNo"
                   render={({ field }) => (
                     <Input
                       {...field}
+                      placeholder="Enter House No"
                       className="input-field"
-                      placeholder="Area Size"
                     />
                   )}
                 />
+              </FormInputWrapperStyled>
+
+              <FormInputWrapperStyled>
+                <div className="ques">
+                  Which area is your property in?{" "}
+                  <span className="star">*</span>
+                </div>
                 <Controller
                   control={control}
-                  name="areaSizeMetric"
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      options={areaSizeOptions}
-                      className="small-select-field"
-                      placeholder="Area Size Unit"
-                    />
-                  )}
-                />
-              </div>
-            </FormInputWrapperStyled>
-
-            <FormInputWrapperStyled>
-              <div className="ques">How many bedrooms does it have?</div>
-
-              <ToggleSelect
-                options={bedroomOptions}
-                propsOnClick={(value) => onOptionChange("bedrooms", value)}
-                selectedValue={bedroomsWatched}
-              />
-            </FormInputWrapperStyled>
-
-            <FormInputWrapperStyled>
-              <div className="ques">How many bathrooms does it have?</div>
-
-              <ToggleSelect
-                options={bathroomOptions}
-                propsOnClick={(value) => onOptionChange("bathrooms", value)}
-                selectedValue={bathroomsWatched}
-              />
-            </FormInputWrapperStyled>
-
-            <FormInputWrapperStyled>
-              <div className="ques">How many garages does it have?</div>
-
-              <ToggleSelect
-                options={garageOptioons}
-                propsOnClick={(value) => onOptionChange("garages", value)}
-                selectedValue={garagesWatched}
-              />
-            </FormInputWrapperStyled>
-
-            <FormInputWrapperStyled>
-              <div className="ques">When is your house built?</div>
-              <Controller
-                control={control}
-                name="yearBuilt"
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    placeholder="Enter Property Built Year"
-                    className="input-field"
-                  />
-                )}
-              />
-            </FormInputWrapperStyled>
-
-            <FormInputWrapperStyled>
-              <div className="ques">Name your property</div>
-              <Controller
-                control={control}
-                name="title"
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    placeholder="Enter Property title"
-                    className="input-field"
-                  />
-                )}
-              />
-            </FormInputWrapperStyled>
-
-            <FormInputWrapperStyled>
-              <div className="ques">What amenities are available?</div>
-
-              <div className="field-desc">
-                Add additional features e.g balcony, utilities, security details
-                etc. (Optional)
-              </div>
-              <div className="add-container" onClick={onFeatureModalOpen}>
-                Add Features
-              </div>
-            </FormInputWrapperStyled>
-
-            <FormInputWrapperStyled>
-              <div className="ques">What do you love about the place?</div>
-              <Controller
-                control={control}
-                name="desc"
-                render={({ field }) => (
-                  <TextArea
-                    {...field}
-                    placeholder="Describe your property"
-                    className="textarea-field"
-                  />
-                )}
-              />
-            </FormInputWrapperStyled>
-
-            <FormInputWrapperStyled>
-              <div className="ques">Upload images of your property</div>
-              <div className="field-desc">
-                Properties with images of good quality generate 8X more leads.
-              </div>
-
-              <Controller
-                control={control}
-                name="images"
-                render={({ field: { value, onChange } }) => {
-                  const handleUpload = ({ file, fileList }) => {
-                    const newImages = fileList.map((f) => f);
-                    onChange([...value, ...newImages]);
-                  };
-
-                  const handleRemove = (imgToRemove) => {
-                    const updated = value.filter(
-                      (img) =>
-                        typeof img === "string"
-                          ? img !== imgToRemove // remove old
-                          : img.uid !== imgToRemove.uid // remove new
-                    );
-
-                    onChange(updated);
-                  };
-
-                  return (
+                  name="adress"
+                  render={({ field, fieldState: { error } }) => (
                     <>
-                      <Upload
-                        multiple
-                        listType="picture"
-                        beforeUpload={() => false} // Prevent auto-upload
-                        onChange={handleUpload}
-                        showUploadList={false}
-                      >
-                        <Button>Click to Upload</Button>
-                      </Upload>
-                      <ImagesWrapperStyled>
-                        {Array.isArray(value) ? (
-                          value?.map((path, index) => {
-                            const isOld = typeof path === "string";
-
-                            const src = isOld
-                              ? `${API_URL}/uploads/${path}`
-                              : URL.createObjectURL(path.originFileObj);
-
-                            return (
-                              <ImageWrapperStyled>
-                                <div
-                                  className="delete-icon"
-                                  onClick={() => handleRemove(path)}
-                                >
-                                  x
-                                </div>
-
-                                <img
-                                  className="property-image"
-                                  src={src}
-                                  alt={`property-image-${index}`}
-                                />
-                              </ImageWrapperStyled>
-                            );
-                          })
-                        ) : (
-                          <>No images found</>
-                        )}
-                      </ImagesWrapperStyled>
+                      <Input
+                        {...field}
+                        placeholder="Address, Block, Phase, City etc"
+                        className="input-field"
+                      />
+                      <div className="error">{error?.message}</div>
                     </>
-                  );
-                }}
-              />
-            </FormInputWrapperStyled>
+                  )}
+                />
+              </FormInputWrapperStyled>
 
-            <FormInputWrapperStyled>
-              <div className="ques">
-                Wanna Enable Seasonal Discount on your property?
+              <FormInputWrapperStyled>
+                <div className="ques">
+                  What is the rent price? <span className="star">*</span>
+                </div>
                 <Controller
                   control={control}
-                  name="isSeasonalDiscount"
-                  render={({ field }) => <Switch onChange={onChange} />}
+                  name="rent"
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <Input
+                        {...field}
+                        placeholder="Rent"
+                        className="input-field"
+                      />
+                      <div className="error">{error?.message}</div>
+                    </>
+                  )}
                 />
-              </div>
-            </FormInputWrapperStyled>
+              </FormInputWrapperStyled>
 
-            {isSeasonalDiscountWatched && (
-              <>
-                <FormInputWrapperStyled>
-                  <div className="ques">What will be the discount title?</div>
+              <FormInputWrapperStyled>
+                <div className="ques">
+                  What is the size of your property?{" "}
+                  <span className="star">*</span>
+                </div>
+                <div className="inputs-container">
                   <Controller
                     control={control}
-                    name="discountLabel"
+                    name="areaSizeUnit"
+                    render={({ field, fieldState: { error } }) => (
+                      <ColumnFlexStyled>
+                        <Input
+                          {...field}
+                          className="input-field"
+                          placeholder="Area Size"
+                        />
+                        <div className="error">{error?.message}</div>
+                      </ColumnFlexStyled>
+                    )}
+                  />
+                  <Controller
+                    control={control}
+                    name="areaSizeMetric"
                     render={({ field }) => (
-                      <Input
+                      <Select
                         {...field}
-                        placeholder="e.g Seasonal Summer Discount"
-                        className="input-field"
+                        options={areaSizeOptions}
+                        className="small-select-field"
+                        placeholder="Area Size Unit"
                       />
                     )}
                   />
-                </FormInputWrapperStyled>
+                </div>
+              </FormInputWrapperStyled>
 
-                <FormInputWrapperStyled>
-                  <div className="ques">What is discount percentage (%)?</div>
-                  <Controller
-                    control={control}
-                    name="discountPercentage"
-                    render={({ field }) => (
+              <FormInputWrapperStyled>
+                <div className="ques">
+                  How many bedrooms does it have?{" "}
+                  <span className="star">*</span>
+                </div>
+
+                <ToggleSelect
+                  options={bedroomOptions}
+                  propsOnClick={(value) => onOptionChange("bedrooms", value)}
+                  selectedValue={bedroomsWatched}
+                />
+              </FormInputWrapperStyled>
+
+              <FormInputWrapperStyled>
+                <div className="ques">
+                  How many bathrooms does it have?{" "}
+                  <span className="star">*</span>
+                </div>
+
+                <ToggleSelect
+                  options={bathroomOptions}
+                  propsOnClick={(value) => onOptionChange("bathrooms", value)}
+                  selectedValue={bathroomsWatched}
+                />
+              </FormInputWrapperStyled>
+
+              <FormInputWrapperStyled>
+                <div className="ques">
+                  How many garages does it have?
+                  <span className="star">*</span>
+                </div>
+
+                <ToggleSelect
+                  options={garageOptioons}
+                  propsOnClick={(value) => onOptionChange("garages", value)}
+                  selectedValue={garagesWatched}
+                />
+              </FormInputWrapperStyled>
+
+              <FormInputWrapperStyled>
+                <div className="ques">When is your house built?</div>
+                <Controller
+                  control={control}
+                  name="yearBuilt"
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Enter Property Built Year"
+                      className="input-field"
+                    />
+                  )}
+                />
+              </FormInputWrapperStyled>
+
+              <FormInputWrapperStyled>
+                <div className="ques">
+                  Name your property
+                  <span className="star">*</span>
+                </div>
+                <Controller
+                  control={control}
+                  name="title"
+                  render={({ field, fieldState: { error } }) => (
+                    <>
                       <Input
                         {...field}
-                        placeholder="e.g 10%"
+                        placeholder="Enter Property title"
                         className="input-field"
                       />
-                    )}
-                  />
-                </FormInputWrapperStyled>
+                      <div className="error">{error?.message}</div>
+                    </>
+                  )}
+                />
+              </FormInputWrapperStyled>
 
-                <FormInputWrapperStyled>
-                  <div className="ques">
-                    Choose when the discount should begin.
-                  </div>
+              <FormInputWrapperStyled>
+                <div className="ques">What amenities are available?</div>
+
+                <div className="field-desc">
+                  Add additional features e.g balcony, utilities, security
+                  details etc. (Optional)
+                </div>
+                <div className="add-container" onClick={onFeatureModalOpen}>
+                  Add Features
+                </div>
+              </FormInputWrapperStyled>
+
+              <FormInputWrapperStyled>
+                <div className="ques">What do you love about the place?</div>
+                <Controller
+                  control={control}
+                  name="desc"
+                  render={({ field }) => (
+                    <TextArea
+                      {...field}
+                      placeholder="Describe your property"
+                      className="textarea-field"
+                    />
+                  )}
+                />
+              </FormInputWrapperStyled>
+
+              <FormInputWrapperStyled>
+                <div className="ques">Upload images of your property</div>
+                <div className="field-desc">
+                  Properties with images of good quality generate 8X more leads.
+                </div>
+
+                <Controller
+                  control={control}
+                  name="images"
+                  render={({ field: { value, onChange } }) => {
+                    const handleUpload = ({ file, fileList }) => {
+                      const newImages = fileList.map((f) => f);
+                      onChange([...value, ...newImages]);
+                    };
+
+                    const handleRemove = (imgToRemove) => {
+                      const updated = value.filter(
+                        (img) =>
+                          typeof img === "string"
+                            ? img !== imgToRemove // remove old
+                            : img.uid !== imgToRemove.uid // remove new
+                      );
+
+                      onChange(updated);
+                    };
+
+                    return (
+                      <>
+                        <Upload
+                          multiple
+                          listType="picture"
+                          beforeUpload={() => false} // Prevent auto-upload
+                          onChange={handleUpload}
+                          showUploadList={false}
+                        >
+                          <Button>Click to Upload</Button>
+                        </Upload>
+                        <ImagesWrapperStyled>
+                          {Array.isArray(value) ? (
+                            value?.map((path, index) => {
+                              const isOld = typeof path === "string";
+
+                              const src = isOld
+                                ? `${API_URL}/uploads/${path}`
+                                : URL.createObjectURL(path.originFileObj);
+
+                              return (
+                                <ImageWrapperStyled>
+                                  <div
+                                    className="delete-icon"
+                                    onClick={() => handleRemove(path)}
+                                  >
+                                    x
+                                  </div>
+
+                                  <img
+                                    className="property-image"
+                                    src={src}
+                                    alt={`property-image-${index}`}
+                                  />
+                                </ImageWrapperStyled>
+                              );
+                            })
+                          ) : (
+                            <>No images found</>
+                          )}
+                        </ImagesWrapperStyled>
+                      </>
+                    );
+                  }}
+                />
+              </FormInputWrapperStyled>
+
+              <FormInputWrapperStyled>
+                <div className="ques">
+                  Wanna Enable Seasonal Discount on your property?
                   <Controller
                     control={control}
-                    name="discountStartDate"
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        placeholder="e.g 10%"
-                        className="input-field"
-                        type="date"
-                      />
-                    )}
+                    name="isSeasonalDiscount"
+                    render={({ field }) => <Switch onChange={onChange} />}
                   />
-                </FormInputWrapperStyled>
+                </div>
+              </FormInputWrapperStyled>
 
-                <FormInputWrapperStyled>
-                  <div className="ques">
-                    Choose when the discount should end.
-                  </div>
-                  <Controller
-                    control={control}
-                    name="discountEndDate"
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        placeholder="e.g 10%"
-                        className="input-field"
-                        type="date"
-                      />
-                    )}
-                  />
-                </FormInputWrapperStyled>
-              </>
-            )}
+              {isSeasonalDiscountWatched && (
+                <>
+                  <FormInputWrapperStyled>
+                    <div className="ques">What will be the discount title?</div>
+                    <Controller
+                      control={control}
+                      name="discountLabel"
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="e.g Seasonal Summer Discount"
+                          className="input-field"
+                        />
+                      )}
+                    />
+                  </FormInputWrapperStyled>
 
-            <FormButtonWrapperStyled>
-              <Button
-                className="cancel-button"
-                onClick={handleSubmit(onSaveAsDraft)}
-              >
-                Save as draft
-              </Button>
-              {isEditMode ? (
-                <Button
-                  className="add-button"
-                  onClick={handleSubmit(onSaveAsEdit)}
-                >
-                  Save
-                </Button>
-              ) : (
-                <Button className="add-button" onClick={handleSubmit(onAdd)}>
-                  Add
-                </Button>
+                  <FormInputWrapperStyled>
+                    <div className="ques">What is discount percentage (%)?</div>
+                    <Controller
+                      control={control}
+                      name="discountPercentage"
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="e.g 10%"
+                          className="input-field"
+                        />
+                      )}
+                    />
+                  </FormInputWrapperStyled>
+
+                  <FormInputWrapperStyled>
+                    <div className="ques">
+                      Choose when the discount should begin.
+                    </div>
+                    <Controller
+                      control={control}
+                      name="discountStartDate"
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="e.g 10%"
+                          className="input-field"
+                          type="date"
+                        />
+                      )}
+                    />
+                  </FormInputWrapperStyled>
+
+                  <FormInputWrapperStyled>
+                    <div className="ques">
+                      Choose when the discount should end.
+                    </div>
+                    <Controller
+                      control={control}
+                      name="discountEndDate"
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="e.g 10%"
+                          className="input-field"
+                          type="date"
+                        />
+                      )}
+                    />
+                  </FormInputWrapperStyled>
+                </>
               )}
 
-              <AddAmenitiesModal
-                visible={isFeatureModalVisible}
-                onClose={onFeatureModalClose}
-                onSubmit={onFeaturesSaved}
-                existingAmenities={features}
-              />
-            </FormButtonWrapperStyled>
-          </AddListingFormStyled>
-        </AddListingFormContainerStyled>
-      </AddListingWrapperStyled>
+              <FormButtonWrapperStyled>
+                {["draft", "main"]?.map((type) => {
+                  const isDraft = type === "draft";
+                  const label = isDraft
+                    ? "Save as draft"
+                    : isEditMode
+                    ? "Save"
+                    : "Add";
+
+                  const onClickHandler = isDraft
+                    ? onSaveAsDraft
+                    : isEditMode
+                    ? onSaveAsEdit
+                    : onAdd;
+
+                  return (
+                    <Tooltip
+                      key={type}
+                      title={
+                        !isFormValid
+                          ? "Please fill all the required fields."
+                          : ""
+                      }
+                      overlayClassName="custom-tooltip"
+                      placement="topRight"
+                    >
+                      <Button
+                        className={isDraft ? "cancel-button" : "add-button"}
+                        onClick={handleSubmit(onClickHandler)}
+                        disabled={!isFormValid}
+                      >
+                        {label}
+                      </Button>
+                    </Tooltip>
+                  );
+                })}
+                <AddAmenitiesModal
+                  visible={isFeatureModalVisible}
+                  onClose={onFeatureModalClose}
+                  onSubmit={onFeaturesSaved}
+                  existingAmenities={features}
+                />
+              </FormButtonWrapperStyled>
+            </AddListingFormStyled>
+          </AddListingFormContainerStyled>
+        </AddListingWrapperStyled>
+      </AddListingPageWrapperStyled>
+      <Footer />
     </AddListingPageStyled>
   );
 };

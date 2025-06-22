@@ -1,7 +1,9 @@
 import styled from "styled-components";
 
-export const AddListingPageStyled = styled.div`
-  padding: 60px;
+export const AddListingPageStyled = styled.div``;
+
+export const AddListingPageWrapperStyled = styled.div`
+  padding: 45px 60px;
 `;
 
 export const BannerWrapperStyled = styled.div`
@@ -77,6 +79,14 @@ export const AddListingFormStyled = styled.div`
       border-color: rgb(55, 71, 79);
       color: rgb(55, 71, 79);
     }
+  }
+  .error,
+  .star {
+    color: red;
+  }
+
+  .error {
+    text-align: left;
   }
 `;
 
@@ -159,6 +169,10 @@ export const FormButtonWrapperStyled = styled.div`
   margin: 15px 0;
   column-gap: 10px;
 
+  .error {
+    color: red;
+  }
+
   .field-desc {
     font-size: 15px;
     margin-bottom: 15px;
@@ -184,6 +198,12 @@ export const FormButtonWrapperStyled = styled.div`
   .textarea-field {
     width: 550px;
   }
+
+  button {
+    :disabled {
+      opacity: 0.5;
+    }
+  }
 `;
 
 export const ImagesWrapperStyled = styled.div`
@@ -208,4 +228,10 @@ export const ImageWrapperStyled = styled.div`
     width: 150px;
     height: 150px;
   }
+`;
+
+export const ColumnFlexStyled = styled.div`
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
 `;

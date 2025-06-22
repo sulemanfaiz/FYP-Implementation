@@ -8,7 +8,7 @@ const signup = async (req, res) => {
     const user = await UserModel.findOne({ email });
     if (user) {
       return res.status(409).json({
-        message: "User is already exist, you can login",
+        message: "User already exist, you can login",
         success: false,
       });
     }

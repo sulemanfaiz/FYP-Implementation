@@ -21,7 +21,7 @@ import {
   DiscountLabelStyled,
   RentStyled,
 } from "./listingdetailstyles";
-import { Header } from "../../components";
+import { Footer, Header } from "../../components";
 import {
   areaSizeOptions,
   propertyOptions,
@@ -94,6 +94,14 @@ const ListingDetail = () => {
     return originalPrice - discountAmount;
   };
 
+  const isDiscountEnabled = property?.isDiscountEnabled;
+
+  const today = new Date(); // current date
+  const startDate = new Date(property?.discountStartDate);
+  const endDate = new Date(property?.discountEndDate);
+
+  const isDiscountActive = today >= startDate && today <= endDate;
+
   return (
     <ListingStyled>
       <Header />
@@ -151,10 +159,12 @@ const ListingDetail = () => {
         {/* Property Details Section */}
         <ListingDetailWrapperStyled>
           <DetailCardStyled>
-            <DiscountLabelStyled>
-              🏷️
-              {property?.discountLabel} - {property?.discountPercentage}% Off
-            </DiscountLabelStyled>
+            {isDiscountEnabled && (
+              <DiscountLabelStyled>
+                🏷️
+                {property?.discountLabel} - {property?.discountPercentage}% Off
+              </DiscountLabelStyled>
+            )}
 
             <div className="name-price-wrapper">
               <div className="property-name">{property?.title}</div>
@@ -187,9 +197,7 @@ const ListingDetail = () => {
 
             <div className="icons-wrapper">
               <div className="icon-item">
-                <RentStyled
-                  isDiscounted={property?.isDiscountEnabled === "true"}
-                >
+                <RentStyled isDiscounted={isDiscountEnabled}>
                   PKR {property?.rent}/Month
                 </RentStyled>
               </div>
@@ -198,29 +206,33 @@ const ListingDetail = () => {
 
           <Divider />
 
-          <TitleSectionStyled>
-            <h2> Discount Details</h2>
-            <div className="property-description">
-              💸 {property?.discountPercentage}% Off
-            </div>
+          {isDiscountEnabled && isDiscountActive && (
+            <>
+              <TitleSectionStyled>
+                <h2> Discount Details</h2>
+                <div className="property-description">
+                  💸 {property?.discountPercentage}% Off
+                </div>
 
-            <div className="property-description">
-              Validity:{"   "} {property?.discountStartDate} to{" "}
-              {property?.discountEndDate}
-              <br />
-              Discounted Price: {"   "}
-              <RentStyled>
-                PKR{" "}
-                {calculateDiscountedPrice(
-                  property?.rent,
-                  property?.discountPercentage
-                )}
-                /Month
-              </RentStyled>
-            </div>
-          </TitleSectionStyled>
+                <div className="property-description">
+                  Validity:{"   "} {property?.discountStartDate} to{" "}
+                  {property?.discountEndDate}
+                  <br />
+                  Discounted Price: {"   "}
+                  <RentStyled>
+                    PKR{" "}
+                    {calculateDiscountedPrice(
+                      property?.rent,
+                      property?.discountPercentage
+                    )}
+                    /Month
+                  </RentStyled>
+                </div>
+              </TitleSectionStyled>
 
-          <Divider />
+              <Divider />
+            </>
+          )}
 
           {/* <ButtonStyled>
             <button className="call-button">
@@ -254,6 +266,8 @@ const ListingDetail = () => {
           </FetaureSectionStyled>
         </ListingDetailWrapperStyled>
       </ListingWrapperStyled>
+
+      <Footer />
     </ListingStyled>
   );
 };

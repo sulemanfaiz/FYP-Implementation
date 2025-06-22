@@ -78,7 +78,7 @@ const Property = ({ card, width, propsOnLikeOrDislike }) => {
 
   const cityText = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
 
-  const isDiscountEnabled = cardDetails?.isDiscountEnabled === "true";
+  const isDiscountEnabled = cardDetails?.isDiscountEnabled;
 
   return (
     <CardContainer

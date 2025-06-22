@@ -5,7 +5,7 @@ import {
   LikedPropertiesWrapperStyled,
 } from "./likedproperties.styles";
 import { useNavigate } from "react-router-dom";
-import { Header, Property } from "../../components";
+import { Footer, Header, Property } from "../../components";
 
 const LikedProperties = () => {
   const [listings, setListings] = useState([]);
@@ -66,6 +66,7 @@ const LikedProperties = () => {
           );
         })}
       </LikedPropertiesWrapperStyled>
+      <Footer />
     </LikedPropertiesPageStyled>
   );
 };

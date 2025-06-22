@@ -80,12 +80,12 @@ export const ButtonStyled = styled.div`
   }
 
   .call-button {
-    background-color: #e73a5d;
+    background-color: #28a745;
     color: white;
   }
 
   .inquire-button {
-    background-color: #e73a5d;
+    background-color: #007bff;
     color: white;
   }
 `;

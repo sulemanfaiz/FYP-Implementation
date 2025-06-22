@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import PageBanner from "../../components/pagebanner";
 import Header from "../../components/header/header";
+import { Footer } from "../../components";
 
 const PropertyListing = (props) => {
   const { listings } = props || {};
@@ -160,6 +161,7 @@ const MyPoperties = (props) => {
           <StyledTabs items={items} onChange={onChange} />
         </PropertiesListingStyled>
       </MyPopertiesPageWrapperStyled>
+      <Footer />
     </MyPopertiesPageStyled>
   );
 };

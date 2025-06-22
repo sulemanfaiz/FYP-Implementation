@@ -1,12 +1,14 @@
 const multer = require("multer");
 
 const {
-  addlisting,
   getListing,
   getListingDetail,
   editListing,
   getAllListings,
   markListingAsInactive,
+  searchListings,
+  detailedFilterListings,
+  addListing,
 } = require("../controllers/listingcontroller");
 
 const { verifyToken, safeVerifyToken } = require("../middlewares/auth");
@@ -28,7 +30,7 @@ router.post(
   "/add-listing",
   verifyToken,
   upload.array("images", 10),
-  addlisting
+  addListing
 );
 
 router.put(
@@ -45,5 +47,9 @@ router.get("/get-user-listings", verifyToken, getListing);
 router.get("/get-all-listings", safeVerifyToken, getAllListings);
 
 router.get("/get-listing-detail/:id", verifyToken, getListingDetail);
+
+router.get("/search", safeVerifyToken, searchListings);
+
+router.get("/filtered-search", safeVerifyToken, detailedFilterListings);
 
 module.exports = router;

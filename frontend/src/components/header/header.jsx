@@ -18,8 +18,6 @@ const Header = () => {
   const userInfoInLC = localStorage.getItem("user");
   const parsedUser = JSON.parse(userInfoInLC);
 
-  console.log({ userInfoInLC, parsedUser: parsedUser });
-
   const isLoggedIn = !!token;
 
   const loggedInUserName = parsedUser?.name || "";
@@ -33,11 +31,15 @@ const Header = () => {
           Kiraye Pa
         </Logo>
         <NavLinks>
-          <NavItem tabIndex="0" onClick={() => navigate("/home")}>
+          <NavItem tabIndex="0" onClick={() => navigate("/add-property")}>
             List It Now
           </NavItem>
-          <NavItem tabIndex="0">About Us</NavItem>
-          <NavItem tabIndex="0">SmartRent AI</NavItem>
+          <NavItem tabIndex="0" onClick={() => navigate("/about-us")}>
+            About Us
+          </NavItem>
+          <NavItem tabIndex="0" onClick={() => navigate("/smart-rent-ai")}>
+            SmartRent AI
+          </NavItem>
         </NavLinks>
       </LeftSectionContainer>
 

@@ -40,3 +40,24 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.custom-tooltip {
+  .ant-tooltip-content {
+    .ant-tooltip-inner {
+      max-width: 400px;
+      padding: 13px 9.2px 14px 15px;
+      box-shadow: 0 0 7px 0 rgba(211, 211, 211, 0.85);
+      background-color: white;
+      color: grey;
+    }
+  }
+}
+
+.custom-tooltip {
+  .ant-tooltip-arrow {
+    box-shadow: 0 0 7px 0 rgba(211, 211, 211, 0.85);
+    background-color: white;
+    /* width: 8px; */
+    height: 8px;
+  }
+}

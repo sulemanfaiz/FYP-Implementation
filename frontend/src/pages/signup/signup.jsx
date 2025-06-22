@@ -19,7 +19,7 @@ import { EyeTwoTone, EyeInvisibleOutlined } from "@ant-design/icons";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const { showSuccess, showError, showLoading, dismiss } = useToast(); // ✅ Use methods
+  const { showSuccess, showError, showLoading } = useToast(); // ✅ Use methods
 
   const {
     control,
@@ -40,8 +40,6 @@ const SignUp = () => {
     async (values) => {
       localStorage.removeItem("token");
 
-      const toastId = showLoading("Creating your account..."); // ✅ loading
-
       try {
         const response = await fetch("http://localhost:8080/auth/signup", {
           method: "POST",
@@ -50,37 +48,30 @@ const SignUp = () => {
         });
 
         const result = await response.json();
-        dismiss(toastId); // ✅ stop loading
 
         const { success, message, error, jwtToken } = result;
 
         if (success) {
-          showSuccess("🎉 Signup successful! Welcome to Kiraya Pa");
+          showSuccess("Signup successful! Welcome to Kiraya Pa");
           localStorage.setItem("token", jwtToken);
           setTimeout(() => navigate("/my-properties"), 1500);
-        } else if (error) {
-          const details =
-            error?.details?.[0]?.message || message || "Signup failed.";
-          showError(`❌ ${details}`);
         } else {
-          showError("❌ Unknown error occurred. Please try again.");
+          showError(message);
         }
       } catch (err) {
-        dismiss(toastId); // in case of crash
-        console.error("Signup error:", err);
         showError(
-          "🔌 Could not connect to the server. Please check your internet."
+          "An error occurred while creating your account. Please try again."
         );
       }
     },
-    [navigate, showSuccess, showError, showLoading, dismiss]
+    [navigate, showSuccess, showError, showLoading]
   );
 
   return (
     <SignupPageStyled>
       {/* Left Section */}
       <LeftSectionStyled>
-        <img src="/Kiraya pa logo.png" alt="Logo" className="logo" />
+        <img src="/KirayaPeLogo.png" alt="Logo" className="logo" />
         <h1>Join Kiraya Pa</h1>
         <p>Your property, your terms — rent effortlessly!</p>
       </LeftSectionStyled>
