@@ -11,7 +11,6 @@ import {
 import { useEffect, useState } from "react";
 import PageBanner from "../../components/pagebanner";
 import Header from "../../components/header/header";
-import { Footer } from "../../components";
 
 const MyPoperties = () => {
   const [property, setProperty] = useState({});
@@ -63,7 +62,6 @@ const MyPoperties = () => {
           <PropertyCard listing={property} showActions />
         </PropertyListingStyled>
       </MyPopertyPageWrapperStyled>
-      <Footer />
     </MyPopertyPageStyled>
   );
 };

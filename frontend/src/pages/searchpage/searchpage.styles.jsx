@@ -1,157 +1,198 @@
 import styled from "styled-components";
+import { devices } from "../../components/breakpointjs/Breakpoint";
 
-export const SearchPageStyled = styled.div``;
+export const SearchPageStyled = styled.div`
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+`;
 
 export const SearchPageWrapperStyled = styled.div`
-  padding: 45px 60px;
+  padding: 2rem 5%;
+  flex: 1;
+
+  @media ${devices.tablet} {
+    padding: 1.5rem 3%;
+  }
+
+  @media ${devices.mobile} {
+    padding: 1rem;
+  }
 `;
 
 export const SearchListingWrapperStyled = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin: 15px auto;
-  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+
+  @media ${devices.mobile} {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 `;
 
 export const SearchOptionsWrapperStyled = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
   flex-wrap: wrap;
-  gap: 15px;
-  margin: 15px auto;
-  max-width: 100%;
+  gap: 0.8rem;
+  margin: 1.5rem 0;
+
+  @media ${devices.mobile} {
+    gap: 0.5rem;
+    justify-content: space-between;
+  }
 `;
 
 export const SearchOptionStyled = styled.div`
-  align-items: center;
-  background-color: transparent;
-  cursor: pointer;
-  text-align: center;
-  font-size: 15px;
-  color: rgba(0, 0, 0, 0.54);
-  height: 35px;
-  min-width: 100px;
   display: flex;
+  align-items: center;
   justify-content: center;
+  background-color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: rgba(0, 0, 0, 0.8);
+  height: 2.5rem;
+  min-width: 6rem;
   border-radius: 8px;
-  padding: 5px;
-  border: 1px solid #f2f2f2;
+  padding: 0 1rem;
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    border-color: #e85451;
+    color: #e85451;
+    box-shadow: 0 2px 5px rgba(232, 84, 81, 0.1);
+  }
+
+  @media ${devices.mobile} {
+    min-width: calc(50% - 0.5rem);
+    font-size: 0.85rem;
+    height: 2.2rem;
+  }
 `;
 
 export const SearchOptionWithActionWrapperStyled = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-
-  svg {
-    width: 10px;
-    height: 15px;
-    path {
-      fill: #e85451;
-    }
-  }
+  gap: 0.5rem;
 `;
 
 export const SearchQueryStyled = styled.div`
   display: flex;
-  column-gap: 5px;
-  align-items: center;
-  justify-content: flex-start;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
 
   .query {
-    margin: 0px;
     font-weight: 600;
-    font-size: 1.811rem;
-    line-height: 1.7;
+    font-size: 1.8rem;
     color: rgb(55, 71, 79);
+    margin: 0;
+
+    @media ${devices.mobile} {
+      font-size: 1.5rem;
+    }
   }
 
   .count {
-    margin: 0px;
     font-weight: 400;
     font-size: 1rem;
-    line-height: 1.7;
     color: #737678;
-    display: inline-flex;
-    align-self: center;
-    padding-left: 5px;
+    margin: 0;
+
+    @media ${devices.mobile} {
+      font-size: 0.9rem;
+    }
   }
 `;
 
 export const PopOverContainerStyled = styled.div`
-  display: flex;
-  column-gap: 5px;
-  align-items: center;
-  justify-content: flex-start;
-  max-width: 500px;
-  flex-direction: column;
+  width: 100%;
+  max-width: 24rem;
+  padding: 1rem;
 `;
 
 export const PopOverValuesContainerStyled = styled.div`
-  display: flex;
-  column-gap: 5px;
-  align-items: flex-start;
-  justify-content: flex-start;
+  width: 100%;
 `;
 
 export const PopOverFooterStyled = styled.div`
   display: flex;
-  width: 100%;
-  column-gap: 5px;
-  align-items: flex-end;
   justify-content: flex-end;
-  margin-top: 20px;
-  margin-bottom: 2px;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+
+  button {
+    min-width: 5rem;
+    height: 2.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
 
   .apply {
     background-color: #e85451;
     border-color: #e85451;
     color: white;
-    min-width: 100px;
-    min-height: 35px;
+
+    &:hover {
+      background-color: #d04a47;
+      border-color: #d04a47;
+    }
   }
 
   .cancel {
-    min-width: 100px;
-    min-height: 35px;
+    &:hover {
+      border-color: #e85451;
+      color: #e85451;
+    }
   }
 
   .clear {
-    min-width: 100px;
-    min-height: 35px;
     border-color: #e85451;
     color: #e85451;
+
+    &:hover {
+      background-color: #fdf2f2;
+    }
   }
 `;
 
 export const PopOverInputWrapperStyled = styled.div`
   display: flex;
-  column-gap: 5px;
-  align-items: center;
-  justify-content: flex-start;
-  max-width: 500px;
   flex-direction: column;
-  row-gap: 10px;
-  margin-top: 20px;
+  gap: 1rem;
+  width: 100%;
 
-  .select-field {
-    width: 150px;
-    max-width: 150px;
-    height: 35px;
-    max-height: 35px;
+  .ant-input {
+    height: 2.5rem;
+    border-radius: 6px;
   }
 
   .inputs-wrapper {
     display: flex;
-    column-gap: 5px;
+    gap: 0.5rem;
     align-items: center;
-    justify-content: flex-start;
+
+    @media ${devices.mobile} {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .select-field {
+    width: 100%;
+
+    .ant-select-selector {
+      height: 2.5rem !important;
+      display: flex;
+      align-items: center;
+    }
   }
 `;

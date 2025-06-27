@@ -6,6 +6,7 @@ import { FaBath } from "react-icons/fa";
 import { IoIosResize, IoIosCall } from "react-icons/io";
 import { CiMail } from "react-icons/ci";
 import { Carousel } from "antd";
+import { WhatsAppOutlined } from "@ant-design/icons";
 import {
   ListingWrapperStyled,
   ListingDetailWrapperStyled,
@@ -27,12 +28,14 @@ import {
   propertyOptions,
 } from "../addlisting/addlisting.config";
 import { getFeatureIcon } from "./listingdetail.util";
+// ✅ Import the Socket component
 
 const API_URL = process.env.REACT_APP_API_URL; // Replace with your actual API URL
 console.log("API URL:", API_URL);
 
 const ListingDetail = () => {
   const { id } = useParams();
+  const [contactModalVisible, setContactModalVisible] = useState(false);
 
   const [property, setProperty] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -156,6 +159,7 @@ const ListingDetail = () => {
             </Carousel>
           </CustomCarouselStyled>
         </Modal>
+
         {/* Property Details Section */}
         <ListingDetailWrapperStyled>
           <DetailCardStyled>
@@ -170,11 +174,17 @@ const ListingDetail = () => {
               <div className="property-name">{property?.title}</div>
 
               <ButtonStyled>
-                <button className="call-button">
-                  <IoIosCall /> Call
+                <button
+                  className="call-button"
+                  onClick={() => setContactModalVisible(true)}
+                >
+                  <WhatsAppOutlined /> WhatsApp
                 </button>
-                <button className="inquire-button">
-                  <CiMail /> Inquire
+                <button
+                  className="inquire-button"
+                  onClick={() => setContactModalVisible(true)}
+                >
+                  <IoIosCall /> Call
                 </button>
               </ButtonStyled>
             </div>
@@ -234,15 +244,6 @@ const ListingDetail = () => {
             </>
           )}
 
-          {/* <ButtonStyled>
-            <button className="call-button">
-              <IoIosCall /> Call
-            </button>
-            <button className="inquire-button">
-              <CiMail /> Inquire
-            </button>
-          </ButtonStyled> */}
-
           {/* Description */}
           <TitleSectionStyled>
             <h2>Description</h2>
@@ -251,6 +252,7 @@ const ListingDetail = () => {
             </div>
           </TitleSectionStyled>
           <Divider />
+
           <FetaureSectionStyled>
             <h2>Features</h2>
             <div className="property-features">

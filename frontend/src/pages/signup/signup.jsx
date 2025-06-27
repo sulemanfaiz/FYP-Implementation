@@ -49,11 +49,19 @@ const SignUp = () => {
 
         const result = await response.json();
 
-        const { success, message, error, jwtToken } = result;
+        const { success, message, error, jwtToken, name, email } = result;
 
         if (success) {
           showSuccess("Signup successful! Welcome to Kiraya Pa");
+
+          // ⬇️ SAVE token AND name + email in localStorage
           localStorage.setItem("token", jwtToken);
+          localStorage.setItem(
+            "user",
+            JSON.stringify({ name: values.name, email: values.email })
+          );
+
+          // Redirect after delay
           setTimeout(() => navigate("/my-properties"), 1500);
         } else {
           showError(message);

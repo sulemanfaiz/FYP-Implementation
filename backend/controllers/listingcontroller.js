@@ -144,7 +144,6 @@ const getAllListings = async (req, res) => {
     let likedListingIds = [];
 
     // If user is logged in, get liked listings
-
     if (req.user) {
       const userId = req.user._id;
       const liked = await LikedListingModel.find({ userId });
@@ -156,25 +155,31 @@ const getAllListings = async (req, res) => {
       isLiked: likedListingIds.includes(listing._id.toString()),
     }));
 
-    return res.status(200).json({
+    // Single response - remove the 'return' and make sure this is the only response
+    res.status(200).json({
       success: true,
       listings: listingsWithLikeFlag,
     });
   } catch (error) {
     console.error("Error fetching all listings:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+
+    // Make sure we haven't already sent a response
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
   }
 };
 
 const getListingDetail = async (req, res) => {
   try {
-    const listingId = req.params.id;
-
-    const listing = await ListingModel.findById(listingId);
-
+    const listingId = req.params.id; // Keep your variable declaration
+    const listing = await ListingModel.findById(listingId).populate(
+      "userId",
+      "mobile name"
+    );
     if (!listing) {
       return res.status(404).json({
         message: "Listing not found",

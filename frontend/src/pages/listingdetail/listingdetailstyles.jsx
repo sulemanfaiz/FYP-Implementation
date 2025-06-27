@@ -1,5 +1,8 @@
 import styled from "styled-components";
 
+// Import your devices breakpoints
+import { devices } from "../../components/breakpointjs/Breakpoint"; // Adjust path as needed
+
 export const ListingStyled = styled.div``;
 
 // Listing Main Wrapper
@@ -7,11 +10,25 @@ export const ListingWrapperStyled = styled.div`
   padding: 2rem;
   max-width: 85%;
   margin: 0 auto;
+
+  @media ${devices.mobile} {
+    padding: 1rem;
+    max-width: 95%;
+  }
+
+  @media ${devices.tablet} {
+    padding: 1.5rem;
+    max-width: 90%;
+  }
 `;
 
 // Detail Section Wrapper
 export const ListingDetailWrapperStyled = styled.div`
   margin-top: 2rem;
+
+  @media ${devices.mobile} {
+    margin-top: 1rem;
+  }
 `;
 
 // Property Detail Card
@@ -56,6 +73,38 @@ export const DetailCardStyled = styled.div`
     align-items: center;
     gap: 6px;
   }
+
+  @media ${devices.mobile} {
+    .name-price-wrapper {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .property-name {
+      font-size: 20px;
+    }
+
+    .icons-wrapper {
+      gap: 0.5rem;
+      margin-top: 1rem;
+      font-size: 14px;
+    }
+
+    .icon-item {
+      gap: 4px;
+    }
+  }
+
+  @media ${devices.tablet} {
+    .property-name {
+      font-size: 22px;
+    }
+
+    .icons-wrapper {
+      font-size: 15px;
+    }
+  }
 `;
 
 // Button Section
@@ -88,6 +137,25 @@ export const ButtonStyled = styled.div`
     background-color: #007bff;
     color: white;
   }
+
+  @media ${devices.mobile} {
+    flex-direction: column;
+    gap: 10px;
+
+    .call-button,
+    .inquire-button {
+      width: 100%;
+      font-size: 16px;
+      padding: 0.7rem 1rem;
+    }
+  }
+
+  @media ${devices.tablet} {
+    .call-button,
+    .inquire-button {
+      font-size: 17px;
+    }
+  }
 `;
 
 // Title Section (Description)
@@ -110,6 +178,29 @@ export const TitleSectionStyled = styled.div`
     line-height: 1.6;
     text-align: start;
   }
+
+  @media ${devices.mobile} {
+    h2 {
+      font-size: 18px;
+      margin-top: 0.3rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .property-description {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+
+  @media ${devices.tablet} {
+    h2 {
+      font-size: 20px;
+    }
+
+    .property-description {
+      font-size: 15px;
+    }
+  }
 `;
 
 export const ImageSectionWrapperStyled = styled.div`
@@ -119,6 +210,10 @@ export const ImageSectionWrapperStyled = styled.div`
   gap: 1rem;
   margin: 0 auto;
   width: 100%;
+
+  @media ${devices.mobile} {
+    gap: 0.5rem;
+  }
 `;
 
 // Image Section (Main + Small Images)
@@ -127,8 +222,7 @@ export const ImageSectionStyled = styled.div`
   justify-content: center;
   align-items: flex-start;
   width: 100%;
-
-  gap: 1rem; // Add this to control spacing between main and small images
+  gap: 1rem;
 
   .main-image-wrapper {
     flex: 3;
@@ -136,7 +230,7 @@ export const ImageSectionStyled = styled.div`
     height: 500px;
 
     img {
-      width: 100%; // Change from 50vw to 100% to fill the container
+      width: 100%;
       height: 100%;
       border-radius: 8px;
       inset: 0px;
@@ -164,6 +258,43 @@ export const ImageSectionStyled = styled.div`
       }
     }
   }
+
+  @media ${devices.mobile} {
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .main-image-wrapper {
+      height: 300px;
+    }
+
+    .small-images-wrapper {
+      flex-direction: row;
+      overflow-x: auto;
+      gap: 0.5rem;
+      padding: 0.5rem 0;
+
+      .small-image {
+        min-width: 120px;
+        height: 120px;
+      }
+    }
+  }
+
+  @media ${devices.tablet} {
+    gap: 0.8rem;
+
+    .main-image-wrapper {
+      height: 400px;
+    }
+
+    .small-images-wrapper {
+      gap: 0.8rem;
+
+      .small-image {
+        height: 190px;
+      }
+    }
+  }
 `;
 
 export const CustomCarouselStyled = styled.div`
@@ -188,6 +319,28 @@ export const CustomCarouselStyled = styled.div`
       right: 38%;
     }
   }
+
+  @media ${devices.mobile} {
+    .slick-slide img {
+      height: 250px;
+    }
+
+    .slick-arrow {
+      width: 30px;
+      height: 30px;
+    }
+  }
+
+  @media ${devices.tablet} {
+    .slick-slide img {
+      height: 320px;
+    }
+
+    .slick-arrow {
+      width: 35px;
+      height: 35px;
+    }
+  }
 `;
 
 export const TypeOfPropertyStyled = styled.div`
@@ -196,6 +349,12 @@ export const TypeOfPropertyStyled = styled.div`
   margin: auto 5px auto 20px;
   background-color: rgb(232, 84, 81);
   border-radius: 2.86px;
+
+  @media ${devices.mobile} {
+    width: 10px;
+    height: 10px;
+    margin: auto 3px auto 10px;
+  }
 `;
 
 export const FetaureSectionStyled = styled.div`
@@ -252,6 +411,42 @@ export const FetaureSectionStyled = styled.div`
       }
     }
   }
+
+  @media ${devices.mobile} {
+    .property-features {
+      column-gap: 4px;
+      justify-content: center;
+    }
+
+    .feature-item {
+      width: 120px;
+      height: 90px;
+      margin: 4px 2px;
+      gap: 3px;
+
+      .icon {
+        width: 35px;
+        height: 35px;
+      }
+    }
+  }
+
+  @media ${devices.tablet} {
+    .property-features {
+      column-gap: 6px;
+    }
+
+    .feature-item {
+      width: 135px;
+      height: 95px;
+      margin: 6px 3px;
+
+      .icon {
+        width: 42px;
+        height: 42px;
+      }
+    }
+  }
 `;
 
 export const DiscountLabelStyled = styled.div`
@@ -264,13 +459,24 @@ export const DiscountLabelStyled = styled.div`
   position: relative;
   border: hidden;
   color: #e95144;
+
+  @media ${devices.mobile} {
+    gap: 3px;
+  }
 `;
 
 export const RentStyled = styled.div`
   font-size: 18px;
   font-weight: bold;
   display: inline-block;
-
   text-decoration: ${({ isDiscounted }) =>
     isDiscounted ? "line-through" : ""};
+
+  @media ${devices.mobile} {
+    font-size: 16px;
+  }
+
+  @media ${devices.tablet} {
+    font-size: 17px;
+  }
 `;

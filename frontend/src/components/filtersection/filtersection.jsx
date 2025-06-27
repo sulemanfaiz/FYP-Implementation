@@ -52,6 +52,7 @@ const FilterSection = (props) => {
     <FilterSectionStyled>
       <FilterSectionContentStyled>
         <div className="filter-by">{filterBy}</div>
+        <div className="comapre">Compare</div>
 
         <ToggleSelect
           options={options}
