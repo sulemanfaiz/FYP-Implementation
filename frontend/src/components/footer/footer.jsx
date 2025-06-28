@@ -37,7 +37,7 @@ const Footer = () => {
         <FooterHeading>Contact Us</FooterHeading>
         <FooterContactItem>
           <MdEmail size={16} />
-          <span>info@Kirayape.com</span>
+          <span>info@RentASpace.com</span>
         </FooterContactItem>
         <FooterContactItem>
           <MdPhone size={16} />
@@ -102,7 +102,7 @@ const Footer = () => {
 
       <BottomBar>
         <Copyright>
-          © {new Date().getFullYear()} Kiraya pe. All Rights Reserved.
+          © {new Date().getFullYear()} Rent A Space. All Rights Reserved.
         </Copyright>
         <MadeWithLove>
           Made with <FaHeart color="#E73A5D" /> by Us

@@ -33,7 +33,7 @@ const Header = () => {
     <HeaderStyled>
       <HeaderContainer>
         <Logo tabIndex="0" onClick={() => navigate("/")}>
-          Kiraye Pa
+          Rent A Space
         </Logo>
 
         {/* Desktop Navigation */}

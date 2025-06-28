@@ -46,7 +46,7 @@ router.get("/get-user-listings", verifyToken, getListing);
 
 router.get("/get-all-listings", safeVerifyToken, getAllListings);
 
-router.get("/get-listing-detail/:id", verifyToken, getListingDetail);
+router.get("/get-listing-detail/:id", safeVerifyToken, getListingDetail);
 
 router.get("/search", safeVerifyToken, searchListings);
 

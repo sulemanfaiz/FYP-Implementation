@@ -1,4 +1,9 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; // ✅ This is crucial
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import dayjs from "dayjs";
+
 import { useParams } from "react-router-dom"; // Import useParams to get the route parameter
 import { Divider, Modal } from "antd";
 import { IoBedOutline } from "react-icons/io5";
@@ -28,23 +33,53 @@ import {
   propertyOptions,
 } from "../addlisting/addlisting.config";
 import { getFeatureIcon } from "./listingdetail.util";
+import { formatNumberWithCommas } from "../../utils/numberformatter";
+import { PageLoader } from "../../components/pageloader";
+
 // ✅ Import the Socket component
 
 const API_URL = process.env.REACT_APP_API_URL; // Replace with your actual API URL
-console.log("API URL:", API_URL);
+
+// Optional: Custom icon to avoid default marker issues in React
+const customIcon = new L.Icon({
+  iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+});
 
 const ListingDetail = () => {
   const { id } = useParams();
+  const [spinning, setSpinning] = useState(true);
+
   const [contactModalVisible, setContactModalVisible] = useState(false);
 
   const [property, setProperty] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [cords, setCords] = useState();
+
+  const getCoordinatesFromAddress = async (address, city) => {
+    // const fullAddress = `${address}, ${city}, Pakistan`;
+    const fullAddress = `international islamic university , islamabad, Pakistan`;
+
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+      fullAddress
+    )}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data && data.length > 0) {
+      const { lat, lon } = data[0];
+      return { lat: parseFloat(lat), lng: parseFloat(lon) };
+    } else {
+      console.log("No coordinates found for this address");
+    }
+  };
 
   useEffect(() => {
     const fetchProperty = async () => {
       try {
-        console.log("Fetching property with ID:", id); // Log the ID
         const response = await fetch(
           `${API_URL}/listing/get-listing-detail/${id}`,
           {
@@ -53,15 +88,30 @@ const ListingDetail = () => {
             },
           }
         );
-        console.log("API Response:", response); // Log the raw response
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        console.log("Fetched Property Data:", result); // Log the parsed data
-        setProperty(result.data); // Set only the `data` key to the `property` state
+
+        const property = result.data;
+
+        console.log("Fetched Property Data:", property); // Log the parsed data
+        setProperty(property); // Set only the `data` key to the `property` state
+
+        getCoordinatesFromAddress(property?.adress, property?.city).then(
+          (coords) => {
+            console.log("coords", coords);
+
+            setCords({
+              lat: coords?.lat,
+              lng: coords?.lng,
+            });
+          }
+        );
       } catch (error) {
         console.error("Error fetching property details:", error); // Log the error
+      } finally {
+        setSpinning(false);
       }
     };
 
@@ -77,11 +127,6 @@ const ListingDetail = () => {
     setIsModalVisible(false);
   };
 
-  if (!property) {
-    return <div>Loading...</div>; // Show a loading state while fetching data
-  }
-  console.log("Rendering property data: ", property);
-
   const propertyTypeText =
     propertyOptions?.find((prop) => prop.value === property?.propertyType)
       ?.label || "";
@@ -89,8 +134,6 @@ const ListingDetail = () => {
   const propertyAreaText =
     areaSizeOptions?.find((prop) => prop.value === property?.areaSizeMetric)
       ?.label || "";
-
-  console.log("property", property);
 
   const calculateDiscountedPrice = (originalPrice, discountPercent) => {
     const discountAmount = (originalPrice * discountPercent) / 100;
@@ -104,38 +147,61 @@ const ListingDetail = () => {
   const endDate = new Date(property?.discountEndDate);
 
   const isDiscountActive = today >= startDate && today <= endDate;
+  const discountLblText = property?.discountLabel || "Discount";
+
+  const latitude = cords?.lat;
+  const longitude = cords?.lng;
+
+  const handleWhatsApp = () => {
+    const phoneNumber = property?.ownerPhone || "";
+    window.open(`https://wa.me/${phoneNumber}`, "_blank");
+  };
+
+  const discountedPrice = calculateDiscountedPrice(
+    property?.rent,
+    property?.discountPercentage
+  );
+
+  const isPropertyImgExists = property?.fileNames?.length > 0;
 
   return (
     <ListingStyled>
       <Header />
+      <PageLoader spinning={spinning} />
 
       <ListingWrapperStyled>
         <ImageSectionWrapperStyled className="ImageSectionWrapperStyled">
-          <ImageSectionStyled className="ImageSectionStyled">
-            {/* Main Image */}
-            <div className="main-image-wrapper" onClick={() => openSlider(0)}>
-              <img
-                src={`${API_URL}/uploads/${property?.fileNames?.[0]}`}
-                alt="Main Property"
-              />
-            </div>
+          {isPropertyImgExists && !spinning ? (
+            <ImageSectionStyled className="ImageSectionStyled">
+              {/* Main Image */}
+              <div className="main-image-wrapper" onClick={() => openSlider(0)}>
+                <img
+                  src={`${API_URL}/uploads/${property?.fileNames?.[0]}`}
+                  alt="Main Property"
+                />
+              </div>
 
-            {/* Smaller Images */}
-            <div className="small-images-wrapper">
-              {property?.fileNames?.slice(1, 3).map((path, index) => (
-                <div
-                  key={index}
-                  className="small-image"
-                  onClick={() => openSlider(index + 1)}
-                >
-                  <img
-                    src={`${API_URL}/uploads/${path}`}
-                    alt={`Property ${index}`}
-                  />
-                </div>
-              ))}
+              {/* Smaller Images */}
+              <div className="small-images-wrapper">
+                {property?.fileNames?.slice(1, 3).map((path, index) => (
+                  <div
+                    key={`${path}-${index}`}
+                    className="small-image"
+                    onClick={() => openSlider(index + 1)}
+                  >
+                    <img
+                      src={`${API_URL}/uploads/${path}`}
+                      alt={`Property ${index}`}
+                    />
+                  </div>
+                ))}
+              </div>
+            </ImageSectionStyled>
+          ) : (
+            <div className="dea-image-wrapper">
+              <img src="/property/adminpropertyimg.jpg" alt="Default Image" />
             </div>
-          </ImageSectionStyled>
+          )}
         </ImageSectionWrapperStyled>
 
         {/* Modal for Image Slider */}
@@ -149,7 +215,7 @@ const ListingDetail = () => {
           <CustomCarouselStyled>
             <Carousel initialSlide={currentSlide} dots arrows>
               {property?.fileNames?.map((path, index) => (
-                <div key={index}>
+                <div key={`${path}-${index}`}>
                   <img
                     src={`${API_URL}/uploads/${path}`}
                     alt={`Property Image ${index}`}
@@ -166,7 +232,7 @@ const ListingDetail = () => {
             {isDiscountEnabled && (
               <DiscountLabelStyled>
                 🏷️
-                {property?.discountLabel} - {property?.discountPercentage}% Off
+                {discountLblText} - {property?.discountPercentage}% Off
               </DiscountLabelStyled>
             )}
 
@@ -174,17 +240,8 @@ const ListingDetail = () => {
               <div className="property-name">{property?.title}</div>
 
               <ButtonStyled>
-                <button
-                  className="call-button"
-                  onClick={() => setContactModalVisible(true)}
-                >
+                <button className="call-button" onClick={handleWhatsApp}>
                   <WhatsAppOutlined /> WhatsApp
-                </button>
-                <button
-                  className="inquire-button"
-                  onClick={() => setContactModalVisible(true)}
-                >
-                  <IoIosCall /> Call
                 </button>
               </ButtonStyled>
             </div>
@@ -208,7 +265,7 @@ const ListingDetail = () => {
             <div className="icons-wrapper">
               <div className="icon-item">
                 <RentStyled isDiscounted={isDiscountEnabled}>
-                  PKR {property?.rent}/Month
+                  PKR {formatNumberWithCommas(property?.rent)}/Month
                 </RentStyled>
               </div>
             </div>
@@ -230,11 +287,7 @@ const ListingDetail = () => {
                   <br />
                   Discounted Price: {"   "}
                   <RentStyled>
-                    PKR{" "}
-                    {calculateDiscountedPrice(
-                      property?.rent,
-                      property?.discountPercentage
-                    )}
+                    PKR {formatNumberWithCommas(discountedPrice)}
                     /Month
                   </RentStyled>
                 </div>
@@ -251,21 +304,48 @@ const ListingDetail = () => {
               {property?.desc || "No description available for this property."}
             </div>
           </TitleSectionStyled>
+
           <Divider />
 
           <FetaureSectionStyled>
             <h2>Features</h2>
             <div className="property-features">
-              {property?.features?.map((feature, index) => (
-                <div key={index} className="feature-item">
-                  <div className={`icon ${feature?.key?.toLowerCase()}`}>
-                    {getFeatureIcon(feature?.key)}
+              {property?.features?.map((feature, index) => {
+                const isCntExists = feature?.count > 0;
+                return (
+                  <div key={`${feature}-${index}`} className="feature-item">
+                    <div className={`icon ${feature?.key?.toLowerCase()}`}>
+                      {getFeatureIcon(feature?.key)}
+                    </div>
+                    {feature?.label}
+                    {isCntExists ? `: ${feature?.count}` : ""}
                   </div>
-                  {feature?.label}: {feature?.count}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </FetaureSectionStyled>
+
+          <Divider />
+
+          {!!latitude && !!longitude && (
+            <TitleSectionStyled>
+              <h2>Location</h2>
+              <MapContainer
+                center={[latitude, longitude]}
+                zoom={15}
+                scrollWheelZoom={true}
+                style={{ height: "400px", width: "100%" }}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Marker position={[latitude, longitude]} icon={customIcon}>
+                  <Popup>This is your property location.</Popup>
+                </Marker>
+              </MapContainer>
+            </TitleSectionStyled>
+          )}
         </ListingDetailWrapperStyled>
       </ListingWrapperStyled>
 

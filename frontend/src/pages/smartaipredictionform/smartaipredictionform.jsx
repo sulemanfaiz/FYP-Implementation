@@ -39,7 +39,7 @@ const SmartPredictionForm = () => {
       bathrooms: "",
       furnished: "",
       areaSizeUnit: "",
-      areaSizeMetric: "",
+      areaSizeMetric: "marla",
     },
     mode: "onChange",
     // resolver: yupResolver(signupFormSchema),

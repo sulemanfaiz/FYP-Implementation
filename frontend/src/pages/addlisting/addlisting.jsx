@@ -12,7 +12,7 @@ import {
   ImageWrapperStyled,
 } from "./addlistingstyle";
 
-import { Input, Select, Tooltip } from "antd";
+import { DatePicker, Input, Select, Tooltip } from "antd";
 import { Switch } from "antd";
 
 import { useForm, Controller } from "react-hook-form";
@@ -39,9 +39,12 @@ import Header from "../../components/header/header";
 import { Footer } from "../../components";
 import { addListingSchema } from "./addlistingschema";
 import { useToast } from "../../hooks/useToast";
+import { PageLoader } from "../../components/pageloader";
+import { BorderedButtonStyled, FilledButtonStyled } from "../../app.styles";
 
 const AddListingContent = (props) => {
   const { showSuccess, showError, showLoading } = useToast(); // ✅ Use methods
+  const [spinning, setSpinning] = useState(false);
 
   const [isFeatureModalVisible, setIsFeatureModalVisible] = useState(false);
 
@@ -102,8 +105,6 @@ const AddListingContent = (props) => {
     resolver: yupResolver(addListingSchema),
   });
 
-  console.log("isValid", { isValid, errors });
-
   const {
     images: fileList,
     propertyType: propertyTypeWatched,
@@ -130,6 +131,7 @@ const AddListingContent = (props) => {
   };
 
   const onSubmitValues = useCallback(async (values, isDraft, isEdited) => {
+    setSpinning(true);
     const {
       propertyType,
       city,
@@ -140,18 +142,17 @@ const AddListingContent = (props) => {
       garages,
       bathrooms,
       title,
-      desc,
+      desc = "",
       images,
-      yearBuilt,
-      status,
+      yearBuilt = "",
       adress,
-      houseNo,
+      houseNo = "",
       features = [],
-      isSeasonalDiscount,
-      discountStartDate,
-      discountEndDate,
-      discountPercentage,
-      discountLabel,
+      isSeasonalDiscount = false,
+      discountStartDate = "",
+      discountEndDate = "",
+      discountPercentage = "",
+      discountLabel = "",
     } = values || {};
 
     const formData = new FormData();
@@ -221,6 +222,8 @@ const AddListingContent = (props) => {
       }
     } catch (err) {
       console.log("catch error", err);
+    } finally {
+      setSpinning(false);
     }
   }, []);
 
@@ -259,6 +262,9 @@ const AddListingContent = (props) => {
   return (
     <AddListingPageStyled>
       <Header />
+
+      <PageLoader spinning={spinning} />
+
       <AddListingPageWrapperStyled>
         <BannerWrapperStyled>
           <div className="text">{pageTitle}</div>
@@ -535,7 +541,9 @@ const AddListingContent = (props) => {
                           onChange={handleUpload}
                           showUploadList={false}
                         >
-                          <Button>Click to Upload</Button>
+                          <BorderedButtonStyled>
+                            Click to Upload
+                          </BorderedButtonStyled>
                         </Upload>
                         <ImagesWrapperStyled>
                           {Array.isArray(value) ? (
@@ -547,7 +555,7 @@ const AddListingContent = (props) => {
                                 : URL.createObjectURL(path.originFileObj);
 
                               return (
-                                <ImageWrapperStyled>
+                                <ImageWrapperStyled key={`${path}-${index}`}>
                                   <div
                                     className="delete-icon"
                                     onClick={() => handleRemove(path)}

@@ -26,7 +26,7 @@ const safeVerifyToken = (req, res, next) => {
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
       if (err) {
-        next();
+        return next();
       }
 
       req.user = user; //  Now req.user will be available

@@ -1,3 +1,4 @@
+import { Button } from "antd";
 import styled from "styled-components";
 
 export const PropertyCardWrapperStyled = styled.div`
@@ -32,8 +33,18 @@ export const PropertyCardWrapperStyled = styled.div`
     }
 
     .type {
+      display: flex;
+      align-items: center;
       font-weight: normal;
       color: rgb(55, 71, 79);
+      column-gap: 5px;
+
+      .box {
+        width: 13px;
+        height: 13px;
+        background-color: rgb(232, 84, 81);
+        border-radius: 2.86px;
+      }
     }
 
     .amenties-section {

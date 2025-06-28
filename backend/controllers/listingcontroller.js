@@ -1,6 +1,10 @@
 const ListingModel = require("../models/listing");
 const LikedListingModel = require("../models/likedlisting");
 
+const UserModel = require("../models/user");
+
+const mongoose = require("mongoose");
+
 const addListing = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -123,7 +127,10 @@ const getListing = async (req, res) => {
   try {
     const userId = req.user._id; // get user id from token
 
-    const listings = await ListingModel.find({ userId });
+    const listings = await ListingModel.find({
+      userId,
+    });
+
     res.status(200).json({
       success: true,
       listings,
@@ -176,24 +183,27 @@ const getAllListings = async (req, res) => {
 const getListingDetail = async (req, res) => {
   try {
     const listingId = req.params.id; // Keep your variable declaration
-    const listing = await ListingModel.findById(listingId).populate(
-      "userId",
-      "mobile name"
-    );
+    const listing = await ListingModel.findById(listingId).populate("userId");
+
+    const owner = await UserModel.findById({ _id: listing?.userId });
+
     if (!listing) {
       return res.status(404).json({
         message: "Listing not found",
         success: false,
       });
     }
+
+    const rest = listing.toObject();
+
     res.status(200).json({
       message: "Listing fetched successfully",
       success: true,
-      data: listing,
+      data: { ...rest, ownerPhone: owner?.mobile },
     });
   } catch (error) {
     console.error("Error fetching user listings:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Internal server error",
     });
@@ -246,16 +256,22 @@ const searchListings = async (req, res) => {
   }
 
   try {
-    const regex = new RegExp(query, "i"); // case-insensitive regex
+    const words = query.split(" ")?.filter((word) => word?.trim() !== "");
 
-    const listings = await ListingModel.find({
-      $or: [
+    // Create regex-based $or condition for each word
+    const orConditions = words?.flatMap((word) => {
+      const regex = new RegExp(word, "i");
+
+      return [
         { city: regex },
         { adress: regex },
         { title: regex },
         { desc: regex },
-      ],
+      ];
     });
+
+    // Find listings where any word matches any of the fields
+    const listings = await ListingModel.find({ $or: orConditions });
 
     res.status(200).json({ success: true, listings });
   } catch (error) {
@@ -279,13 +295,18 @@ const detailedFilterListings = async (req, res) => {
     const filter = {};
 
     if (q) {
-      const regex = new RegExp(q, "i");
-      filter.$or = [
-        { city: regex },
-        { adress: regex },
-        { title: regex },
-        { desc: regex },
-      ];
+      const words = q.split(" ").filter((word) => word.trim() !== "");
+      const regexFilters = words.flatMap((word) => {
+        const regex = new RegExp(word, "i");
+        return [
+          { city: regex },
+          { adress: regex },
+          { title: regex },
+          { desc: regex },
+        ];
+      });
+
+      filter.$or = regexFilters; // OR match on any field for any word
     }
 
     if (propertyType) {

@@ -18,18 +18,11 @@ export const LANDMARKS_ITEMS = [
 ];
 
 export const SECONDARY_FEATURES = [
-  { key: "GEN", label: "Backup Generator" },
   { key: "MAI", label: "Maintenance" },
-  { key: "PET", label: "Pet Caretaker" },
-  { key: "PKG", label: "Dedicated Parking" },
   { key: "CCT", label: "CCTV Surveillance" },
-  { key: "WIF", label: "Guest Wi-Fi" },
   { key: "SWP", label: "Swimming Pool" },
   { key: "DTK", label: "Dirty Kitchen" },
   { key: "LWN", label: "Lawn" },
-  { key: "ELV", label: "Elevator / Lift" },
-  { key: "SPE", label: "Separate Entry" },
-  { key: "RTP", label: "Reusable Top" },
   { key: "CHT", label: "Central Heating" },
   { key: "CCL", label: "Central Cooling" },
 ];

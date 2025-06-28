@@ -28,6 +28,7 @@ const signup = async (req, res) => {
       jwtToken,
       email: userModel.email,
       name: userModel.name,
+      phone: userModel.mobile,
     });
   } catch (err) {
     console.log("controller err", err);
@@ -55,6 +56,7 @@ const login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
+    console.log("user", user);
 
     res.status(200).json({
       message: "Login Success",
@@ -62,6 +64,7 @@ const login = async (req, res) => {
       jwtToken,
       email,
       name: user.name,
+      mobile: user.mobile,
     });
   } catch (err) {
     console.log("controller err", err);

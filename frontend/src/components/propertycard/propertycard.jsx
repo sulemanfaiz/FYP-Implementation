@@ -5,6 +5,7 @@ import {
 } from "../../pages/addlisting/addlisting.config";
 import {
   MoreActionItemStyled,
+  MoreButtonStyled,
   MoreButtonWrapperStyled,
   PropertyCardWrapperStyled,
 } from "./propertycard.styles";
@@ -12,6 +13,9 @@ import {
 import { Button, ConfigProvider, Flex, Popover } from "antd";
 import { useState } from "react";
 import SetAsInActiveModal from "../setasinactivemodal/setasinactivemodal";
+import { formatNumberWithCommas } from "../../utils/numberformatter";
+import { TypeOfPropertyStyled } from "../../pages/listingdetail/listingdetailstyles";
+import { BorderedButtonStyled } from "../../app.styles";
 
 const MoreActions = (props) => {
   const { propertyId } = props || {};
@@ -67,7 +71,7 @@ const PropertyCard = (props) => {
   const {
     rent,
     title,
-    desc,
+    desc = "",
     bedrooms,
     bathrooms,
     propertyType,
@@ -96,7 +100,7 @@ const PropertyCard = (props) => {
       {showActions && (
         <MoreButtonWrapperStyled>
           <Popover placement="bottomRight" title="" content={content}>
-            <Button>More</Button>
+            <BorderedButtonStyled>More</BorderedButtonStyled>
           </Popover>
         </MoreButtonWrapperStyled>
       )}
@@ -113,8 +117,11 @@ const PropertyCard = (props) => {
       </div>
 
       <div className="info-section">
-        <div className="price">PKR {rent}</div>
-        <div className="type">{propertyTypeText}</div>
+        <div className="price">PKR {formatNumberWithCommas(rent)}</div>
+        <div className="type">
+          <div className="box" />
+          {propertyTypeText}
+        </div>
         <div className="amenties-section">
           <div className="amenity">
             <div className="icon">
@@ -139,7 +146,9 @@ const PropertyCard = (props) => {
         </div>
 
         <div className="title">{title}</div>
-        <div className="desc">{desc}</div>
+        <div className="desc" title={desc}>
+          {desc}
+        </div>
       </div>
     </PropertyCardWrapperStyled>
   );

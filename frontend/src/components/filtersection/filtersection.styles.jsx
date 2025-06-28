@@ -58,20 +58,14 @@ export const CardContainer = styled.div`
 `;
 
 export const NoDataCardContainerStyled = styled.div`
-  .no-data {
-    max-width: 250px;
-    min-width: 250px;
-    max-height: 450px;
-    min-height: 100px;
-    background-color: #ffffff;
-    border-radius: 4px;
-    border: 1px solid #f2f2f2;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
+  background-color: #ffffff;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* margin: 0 auto; */
 `;
 export const AreaInfo = styled.div`
   padding: 16px;

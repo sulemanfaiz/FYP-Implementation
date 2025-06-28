@@ -121,7 +121,7 @@ export const ButtonStyled = styled.div`
     font-weight: 500;
     border-radius: 8px;
     cursor: pointer;
-    width: 120px;
+    width: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -396,18 +396,6 @@ export const FetaureSectionStyled = styled.div`
       svg {
         width: 100%;
         height: 100%;
-
-        path {
-          fill: #737678;
-        }
-      }
-
-      &.mos {
-        svg {
-          path {
-            stroke: #737678;
-          }
-        }
       }
     }
   }

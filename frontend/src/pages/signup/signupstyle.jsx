@@ -31,12 +31,14 @@ export const LeftSectionStyled = styled.div`
 
   h1 {
     font-size: 2.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
   }
 
   p {
     font-size: 1.2rem;
-    max-width: 300px;
+    max-width: 400px;
+    margin-top: 0.5rem;
+    font-style: italic;
   }
 
   @media ${devices.mobile} {
@@ -87,13 +89,11 @@ export const RightSectionStyled = styled.div`
 
 export const SignupWrapperStyled = styled.div`
   width: 100%;
-  max-width: 400px;
-  padding: 2rem;
+  max-width: 550px;
 
   .signup-heading {
     font-size: 2rem;
     font-weight: bold;
-    margin-bottom: 1rem;
     text-align: center;
   }
 
@@ -131,19 +131,20 @@ export const SignupWrapperStyled = styled.div`
 export const SignupContainerStyled = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.5rem;
 
   .signup-button {
     background-color: #e85451;
     color: white;
     font-weight: bold;
-    margin-top: 1rem;
     padding: 20px 20px;
     border-radius: 4px;
     border: none;
     cursor: pointer;
     font-size: 1rem;
     transition: background-color 0.3s;
+    width: 150px;
+    align-self: center;
 
     &:hover {
       background-color: #d43e3a;
@@ -154,10 +155,17 @@ export const SignupContainerStyled = styled.div`
     background: none;
     border: none;
     color: #e85451;
-    margin-top: 1rem;
+    margin-top: 0;
     text-decoration: underline;
     cursor: pointer;
     font-size: 1rem;
+
+    :hover,
+    :active,
+    :focus {
+      text-decoration: underline;
+      color: #e85451;
+    }
   }
 
   @media ${devices.mobile} {
@@ -180,12 +188,38 @@ export const FormInputWrapperStyled = styled.div`
   .form-row {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 0.5rem;
+
+    .text-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      margin-bottom: 5px;
+
+      .desc {
+        color: grey;
+        text-align: left;
+        font-size: 14px;
+      }
+    }
+
+    .error {
+      color: red;
+      text-align: right;
+      font-size: 14px;
+    }
 
     .label {
       font-weight: bold;
       font-size: 0.9rem;
       color: #333;
+
+      .star {
+        color: red;
+        margin-left: 2px;
+      }
     }
 
     .input-field {

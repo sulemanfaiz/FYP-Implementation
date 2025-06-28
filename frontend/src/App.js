@@ -1,5 +1,7 @@
 // import "antd/dist/antd.css";
 import "./App.css";
+import "leaflet/dist/leaflet.css";
+
 import AddListing from "./pages/addlisting";
 import Dashboard from "./pages/dashboard";
 import Listing from "./pages/listing";
@@ -19,6 +21,7 @@ import {
   SearchPage,
 } from "./pages";
 import Toast from "./components/toast/toast";
+import MapComponent from "./components/mapcomponent";
 
 function App() {
   return (

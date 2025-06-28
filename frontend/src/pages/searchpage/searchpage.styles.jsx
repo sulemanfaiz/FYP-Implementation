@@ -112,9 +112,7 @@ export const SearchQueryStyled = styled.div`
 `;
 
 export const PopOverContainerStyled = styled.div`
-  width: 100%;
-  max-width: 24rem;
-  padding: 1rem;
+  width: 400px;
 `;
 
 export const PopOverValuesContainerStyled = styled.div`

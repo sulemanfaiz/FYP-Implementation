@@ -4,9 +4,9 @@ export const ToggleSelectWrapperStyled = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
-  max-width: 80%;
+  /* max-width: 80%; */
 
   .option {
     padding: 10px;

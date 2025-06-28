@@ -5,4 +5,14 @@ export const StyledTabsWrapperStyled = styled.div`
     color: rgb(55, 71, 79);
     font-weight: 600;
   }
+
+  .ant-tabs-tab:hover {
+    color: #e85451;
+  }
+
+  .ant-tabs {
+    .ant-tabs-ink-bar {
+      background: #e85451;
+    }
+  }
 `;

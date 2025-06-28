@@ -17,7 +17,15 @@ const ListingSchema = new Schema({
   desc: { type: String },
   paths: [{ type: String }],
   fileNames: [{ type: String }],
-  userId: { type: String, required: true },
+  userId: {
+    type: String,
+    // ref: "User",
+    required: true,
+  },
+  // type: mongoose.Schema.Types.ObjectId,
+  // ref: "users",
+  // required: true,
+
   comment: { type: String },
   reason: { type: String },
   status: { type: String, default: "ACT" }, // ACT, INA, DFT, etc.

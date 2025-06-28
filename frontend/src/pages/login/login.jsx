@@ -8,7 +8,7 @@ import {
   RightSectionStyled,
   StyledButton,
 } from "./loginstyle";
-import { Input } from "antd";
+import { Button, Input } from "antd";
 import { useForm, Controller } from "react-hook-form";
 import { useCallback, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { loginFormSchema } from "../../schema/loginschema";
 import { useToast } from "../../hooks/useToast"; // ⟵ NEW
 import { EyeTwoTone, EyeInvisibleOutlined } from "@ant-design/icons";
+import { StyledTextButton } from "../../app.styles";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -53,13 +54,13 @@ const Login = () => {
         });
 
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const { success, message, error, jwtToken, name, email } =
+        const { success, message, error, jwtToken, name, email, mobile } =
           await response.json();
 
         if (success) {
           showSuccess("🎉 Login Successful! Welcome back!");
           localStorage.setItem("token", jwtToken);
-          localStorage.setItem("user", JSON.stringify({ name, email }));
+          localStorage.setItem("user", JSON.stringify({ name, email, mobile }));
 
           // wait a moment so user sees the toast
           setTimeout(() => navigate("/my-properties"), 1500);
@@ -80,8 +81,7 @@ const Login = () => {
       {/* Left section (branding) */}
       <LeftSectionStyled>
         <div className="content">
-          <img src="/KirayaPeLogo.png" alt="Logo" className="logo" />
-          <h1 className="welcome-heading">Welcome to Kiraya Pa</h1>
+          <h1 className="welcome-heading">Welcome to Rent A Space</h1>
           <p className="tagline">Rent Smart, Live Better.</p>
         </div>
       </LeftSectionStyled>
@@ -98,50 +98,53 @@ const Login = () => {
             {/* Email */}
             <FormInputWrapperStyled>
               <div className="form-row">
-                <div className="label">Email</div>
+                <div className="label">
+                  Email
+                  <span className="star">*</span>
+                </div>
                 <Controller
                   control={control}
                   name="email"
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder="Enter your email"
-                      className="input-field"
-                      status={errors.email ? "error" : ""}
-                      size="large"
-                    />
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <Input
+                        {...field}
+                        placeholder="Enter your email"
+                        className="input-field"
+                        status={errors.email ? "error" : ""}
+                        size="large"
+                      />
+                      <div className="error">{error?.message}</div>
+                    </>
                   )}
                 />
-                {errors.email && (
-                  <span className="error-message">{errors.email.message}</span>
-                )}
               </div>
             </FormInputWrapperStyled>
 
             {/* Password */}
             <FormInputWrapperStyled>
               <div className="form-row">
-                <div className="label">Password</div>
+                <div className="label">
+                  Password
+                  <span className="star">*</span>
+                </div>
                 <Controller
                   control={control}
                   name="password"
-                  render={({ field }) => (
-                    <Input.Password
-                      {...field}
-                      placeholder="Password"
-                      className="input-field"
-                      // 👇 custom icons ↴
-                      iconRender={(visible) =>
-                        visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                      }
-                    />
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <Input.Password
+                        {...field}
+                        placeholder="Password"
+                        className="input-field"
+                        iconRender={(visible) =>
+                          visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                        }
+                      />
+                      <div className="error">{error?.message}</div>
+                    </>
                   )}
                 />
-                {errors.password && (
-                  <span className="error-message">
-                    {errors.password.message}
-                  </span>
-                )}
               </div>
             </FormInputWrapperStyled>
 
@@ -156,14 +159,12 @@ const Login = () => {
               {isLoading ? "Logging in…" : "Login"}
             </StyledButton>
 
-            <StyledButton
-              type="default"
+            <StyledTextButton
               onClick={() => navigate("/signup")}
-              disabled={isLoading}
-              size="large"
+              type="default"
             >
-              Don’t have an account? Signup
-            </StyledButton>
+              Don’t have an account? Signup{" "}
+            </StyledTextButton>
           </LoginContainerStyled>
         </LoginWrapperStyled>
       </RightSectionStyled>

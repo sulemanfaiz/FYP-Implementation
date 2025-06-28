@@ -89,6 +89,10 @@ export const AddListingFormStyled = styled.div`
   gap: 10px;
   margin-top: 20px;
 
+  .toggle-select-wrapper {
+    max-width: 80%;
+  }
+
   .add-button {
     width: 150px;
     height: 50px;
@@ -192,6 +196,16 @@ export const FormInputWrapperStyled = styled.div`
     width: 350px;
     height: 45px;
 
+    .ant-select-selector {
+      &:focus,
+      &:hover,
+      &:active {
+        border-color: #e85451 !important;
+        outline: none;
+        border-radius: 4px;
+      }
+    }
+
     .ant-select-selection-placeholder,
     .ant-select-selection-item {
       display: flex;
@@ -202,6 +216,15 @@ export const FormInputWrapperStyled = styled.div`
     width: 150px;
     height: 45px;
 
+    .ant-select-selector {
+      &:focus,
+      &:hover {
+        border-color: #e85451 !important;
+        outline: none;
+        border-radius: 4px;
+      }
+    }
+
     .ant-select-selection-placeholder,
     .ant-select-selection-item {
       display: flex;
@@ -211,10 +234,24 @@ export const FormInputWrapperStyled = styled.div`
   .input-field {
     width: 350px;
     height: 45px;
+
+    &:focus,
+    &:hover {
+      border-color: #e85451;
+      box-shadow: 0 0 5px rgba(232, 84, 81, 0.3);
+      outline: none;
+    }
   }
 
   .textarea-field {
     width: 550px;
+
+    &:focus,
+    &:hover {
+      border-color: #e85451;
+      box-shadow: 0 0 5px rgba(232, 84, 81, 0.3);
+      outline: none;
+    }
   }
 
   .add-container {

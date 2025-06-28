@@ -6,9 +6,14 @@ import {
 } from "./likedproperties.styles";
 import { useNavigate } from "react-router-dom";
 import { Footer, Header, Property } from "../../components";
+import { NoDataFound } from "../../components/nodatafound";
+import { NoDataFoundImgWrapperStyled } from "../../app.styles";
+import { PageLoader } from "../../components/pageloader";
 
 const LikedProperties = () => {
   const [listings, setListings] = useState([]);
+  const [spinning, setSpinning] = useState(true);
+
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -41,6 +46,8 @@ const LikedProperties = () => {
       }
     } catch (err) {
       console.log("catch error", err);
+    } finally {
+      setSpinning(false);
     }
   };
 
@@ -48,23 +55,33 @@ const LikedProperties = () => {
     getUserLikedListings();
   }, []);
 
+  const isLikedPropertiesExists = listings?.length > 0;
+
   return (
     <LikedPropertiesPageStyled>
       <Header />
+      <PageLoader spinning={spinning} />
+
       <LikedPropertiesPageHeaderStyled>
         Liked Properties
       </LikedPropertiesPageHeaderStyled>
       <LikedPropertiesWrapperStyled>
-        {listings?.map((card) => {
-          return (
-            <Property
-              key={card?._id}
-              card={card}
-              width="300px"
-              propsOnLikeOrDislike={getUserLikedListings}
-            />
-          );
-        })}
+        {isLikedPropertiesExists ? (
+          listings?.map((card) => {
+            return (
+              <Property
+                key={card?._id}
+                card={card}
+                width="300px"
+                propsOnLikeOrDislike={getUserLikedListings}
+              />
+            );
+          })
+        ) : (
+          <NoDataFoundImgWrapperStyled>
+            <NoDataFound />
+          </NoDataFoundImgWrapperStyled>
+        )}
       </LikedPropertiesWrapperStyled>
       <Footer />
     </LikedPropertiesPageStyled>

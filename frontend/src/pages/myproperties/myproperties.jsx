@@ -15,6 +15,8 @@ import { useEffect, useState } from "react";
 import PageBanner from "../../components/pagebanner";
 import Header from "../../components/header/header";
 import { Footer } from "../../components";
+import { NoDataFound } from "../../components/nodatafound";
+import { PageLoader } from "../../components/pageloader";
 
 const PropertyListing = (props) => {
   const { listings } = props || {};
@@ -30,8 +32,7 @@ const PropertyListing = (props) => {
     <ListingsStyled>
       {isListingEmpty ? (
         <NoListingFoundStyled>
-          <div className="text">No Properties found</div>
-          <img src="/property/nolistingfound.svg" alt="no-listing-found" />
+          <NoDataFound />
         </NoListingFoundStyled>
       ) : (
         listings?.map((listing) => (
@@ -39,6 +40,7 @@ const PropertyListing = (props) => {
             listing={listing}
             propsOnClick={() => onPropertyClick(listing?._id)}
             showActions={false}
+            key={listing?._id}
           />
         ))
       )}
@@ -47,6 +49,8 @@ const PropertyListing = (props) => {
 };
 
 const MyPoperties = (props) => {
+  const [spinning, setSpinning] = useState(true);
+
   const { isLikedPropertiesListing } = props;
   const [tab, setTab] = useState("1");
   const [listings, setListings] = useState([]);
@@ -106,12 +110,6 @@ const MyPoperties = (props) => {
   const token = localStorage.getItem("token");
 
   const getUserListings = async () => {
-    const urlContrller = isLikedPropertiesListing ? "likedlisting" : "listing";
-
-    const urlEndPoint = isLikedPropertiesListing
-      ? "get-user-liked-listings"
-      : "get-user-listings";
-
     try {
       const response = await fetch(
         `http://localhost:8080/listing/get-user-listings`,
@@ -133,6 +131,8 @@ const MyPoperties = (props) => {
       }
     } catch (err) {
       console.log("catch error", err);
+    } finally {
+      setSpinning(false);
     }
   };
 
@@ -143,6 +143,7 @@ const MyPoperties = (props) => {
   return (
     <MyPopertiesPageStyled>
       <Header />
+
       <MyPopertiesPageWrapperStyled>
         <PageBanner
           heading={`${isLikedPropertiesListing ? "Liked" : "My"} Properties`}
@@ -157,6 +158,7 @@ const MyPoperties = (props) => {
               Add Property
             </AddPropertyButtonStyled>
           )}
+          <PageLoader spinning={spinning} />
 
           <StyledTabs items={items} onChange={onChange} />
         </PropertiesListingStyled>

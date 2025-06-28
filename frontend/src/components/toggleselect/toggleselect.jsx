@@ -4,7 +4,7 @@ const ToggleSelect = (props) => {
   const { options, propsOnClick, selectedValue = "" } = props || {};
 
   return (
-    <ToggleSelectWrapperStyled>
+    <ToggleSelectWrapperStyled className="toggle-select-wrapper">
       {options?.map((option, index) => {
         const { label = "", value = "" } = option || {};
 

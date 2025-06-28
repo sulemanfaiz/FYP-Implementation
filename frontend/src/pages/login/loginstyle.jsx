@@ -97,7 +97,7 @@ export const RightSectionStyled = styled.div`
 
 export const LoginWrapperStyled = styled.div`
   width: 100%;
-  max-width: 400px;
+  max-width: 550px;
   padding: 20px;
 
   .login-heading {
@@ -111,6 +111,42 @@ export const LoginWrapperStyled = styled.div`
     font-size: 16px;
     color: #666;
     margin-bottom: 20px;
+  }
+
+  .ant-btn-variant-outlined:not(:disabled) {
+    background: none;
+    border: none;
+    color: #e85451;
+    margin-top: 0;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 1rem;
+
+    :hover,
+    :active,
+    :focus {
+      text-decoration: underline;
+      color: #e85451;
+    }
+  }
+
+  .ant-button {
+    &.text-button {
+      background: none;
+      border: none;
+      color: #e85451;
+      margin-top: 0;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 1rem;
+
+      :hover,
+      :active,
+      :focus {
+        text-decoration: underline;
+        color: #e85451;
+      }
+    }
   }
 
   @media ${devices.mobile} {
@@ -157,12 +193,24 @@ export const FormInputWrapperStyled = styled.div`
   .form-row {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    align-items: flex-start;
+    gap: 0.5rem;
 
     .label {
       font-size: 14px;
       color: #333;
       font-weight: 600;
+
+      .star {
+        color: red;
+        margin-left: 2px;
+      }
+    }
+
+    .error {
+      color: red;
+      text-align: right;
+      font-size: 14px;
     }
 
     .input-field {
@@ -203,6 +251,8 @@ export const StyledButton = styled(Button)`
   font-size: 16px;
   font-weight: 600;
   border-radius: 6px;
+  width: 150px;
+  align-self: center;
 
   &:hover {
     background-color: #b7322f !important;

@@ -1,3 +1,5 @@
+import { NoDataFoundImgStyled } from "../../app.styles";
+import { NoDataFound } from "../nodatafound";
 import Property from "../property";
 import ToggleSelect from "../toggleselect";
 import {
@@ -52,7 +54,6 @@ const FilterSection = (props) => {
     <FilterSectionStyled>
       <FilterSectionContentStyled>
         <div className="filter-by">{filterBy}</div>
-        <div className="comapre">Compare</div>
 
         <ToggleSelect
           options={options}
@@ -62,28 +63,26 @@ const FilterSection = (props) => {
       </FilterSectionContentStyled>
 
       <CarasolWrapperStyled>
-        <Carousel afterChange={onChange} dots={false} arrows>
-          {isDataExists ? (
-            groupedCarsolCards?.map((group, index) => {
+        {isDataExists ? (
+          <Carousel afterChange={onChange} dots={false} arrows>
+            {groupedCarsolCards?.map((group, index) => {
               return (
                 <StyledCarouselContentGroupWrapper
                   key={index}
                   isDataExists={isDataExists}
                 >
                   {group?.map((card) => {
-                    return <Property card={card} />;
+                    return <Property card={card} key={card?._id} />;
                   })}
                 </StyledCarouselContentGroupWrapper>
               );
-            })
-          ) : (
-            <NoDataCardContainerStyled>
-              <div className="no-data">
-                No data found against selected filter
-              </div>
-            </NoDataCardContainerStyled>
-          )}
-        </Carousel>
+            })}
+          </Carousel>
+        ) : (
+          <NoDataCardContainerStyled>
+            <NoDataFound />
+          </NoDataCardContainerStyled>
+        )}
       </CarasolWrapperStyled>
     </FilterSectionStyled>
   );

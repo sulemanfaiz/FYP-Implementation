@@ -10,19 +10,11 @@ export const PredictionPageStyled = styled.div`
 export const PredictionPageWrapperStyled = styled.div`
   padding: 2rem 5%;
   flex: 1;
-
-  @media ${devices.tablet} {
-    padding: 1.5rem 3%;
-  }
-
-  @media ${devices.mobile} {
-    padding: 1rem;
-  }
 `;
 
 export const PredictionPageFieldsWrapperStyled = styled.div`
   max-width: 800px;
-  margin: 2rem auto 0;
+  margin: 2rem 20px 0;
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -76,8 +68,19 @@ export const FormInputWrapperStyled = styled.div`
     max-width: 350px;
     height: 3rem;
 
-    @media ${devices.mobile} {
-      max-width: 100%;
+    .ant-select-selector {
+      &:focus,
+      &:hover,
+      &:active {
+        border-color: #e85451 !important;
+        outline: none;
+        border-radius: 4px;
+      }
+    }
+
+    .ant-select-selection-placeholder,
+    .ant-select-selection-item {
+      display: flex;
     }
   }
 
@@ -86,8 +89,19 @@ export const FormInputWrapperStyled = styled.div`
     max-width: 150px;
     height: 3rem;
 
-    @media ${devices.mobile} {
-      max-width: 100%;
+    .ant-select-selector {
+      &:focus,
+      &:hover,
+      &:active {
+        border-color: #e85451 !important;
+        outline: none;
+        border-radius: 4px;
+      }
+    }
+
+    .ant-select-selection-placeholder,
+    .ant-select-selection-item {
+      display: flex;
     }
   }
 

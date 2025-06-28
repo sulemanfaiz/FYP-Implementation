@@ -14,6 +14,7 @@ import {
 import { HeartOutlined } from "@ant-design/icons";
 import { filledHeart, unfilledHeart } from "../../svgs";
 import { useNavigate } from "react-router-dom";
+import { formatNumberWithCommas } from "../../utils/numberformatter";
 
 const Property = ({ card, width, propsOnLikeOrDislike }) => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const Property = ({ card, width, propsOnLikeOrDislike }) => {
   const {
     rent,
     title,
-    desc,
+    desc = "",
     bedrooms,
     bathrooms,
     propertyType,
@@ -49,6 +50,8 @@ const Property = ({ card, width, propsOnLikeOrDislike }) => {
 
   const listingId = cardDetails._id;
   const token = localStorage.getItem("token");
+
+  const isUserLoggedIn = !!token;
 
   const likeOrDislike = async () => {
     try {
@@ -106,20 +109,22 @@ const Property = ({ card, width, propsOnLikeOrDislike }) => {
             </div>
           )}
 
-          <div
-            className={`like-icon ${cardDetails.isLiked ? "liked" : ""}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              likeOrDislike();
-            }}
-          >
-            {cardDetails?.isLiked ? filledHeart : unfilledHeart}
-          </div>
+          {isUserLoggedIn && (
+            <div
+              className={`like-icon ${cardDetails.isLiked ? "liked" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                likeOrDislike();
+              }}
+            >
+              {cardDetails?.isLiked ? filledHeart : unfilledHeart}
+            </div>
+          )}
         </CardMetaInfoWrapper>
       </ImageWrapper>
 
       <InfoSectionStyled>
-        <div className="price">PKR {rent}</div>
+        <div className="price">PKR {formatNumberWithCommas(rent)}</div>
         <div className="type">
           {propertyTypeText} in {cityText}
         </div>
@@ -147,7 +152,9 @@ const Property = ({ card, width, propsOnLikeOrDislike }) => {
         </div>
 
         <div className="title">{title}</div>
-        <div className="desc">{desc}</div>
+        <div className="desc" title={desc}>
+          {desc}
+        </div>
       </InfoSectionStyled>
     </CardContainer>
   );

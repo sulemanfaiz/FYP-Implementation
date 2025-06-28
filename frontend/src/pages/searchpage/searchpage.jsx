@@ -1,5 +1,8 @@
 import { useParams } from "react-router-dom";
 import { Footer, Header, Property } from "../../components";
+import { Spin } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+
 import {
   PopOverContainerStyled,
   PopOverFooterStyled,
@@ -24,11 +27,15 @@ import {
   propertyOptions,
 } from "../addlisting/addlisting.config";
 import ToggleSelect from "../../components/toggleselect";
+import { NoDataFoundImgWrapperStyled } from "../../app.styles";
+import { NoDataFound } from "../../components/nodatafound";
+import { PageLoader } from "../../components/pageloader";
 
 const SearchPage = () => {
   const { query } = useParams();
   const [listings, setListings] = useState([]);
   const [showPopover, setShowPopover] = useState({});
+  const [spinning, setSpinning] = useState(true);
   const [detailedSearch, setDetailedSearch] = useState({
     residential: { value: "" },
   });
@@ -36,8 +43,6 @@ const SearchPage = () => {
   const [transientFilters, setTransientFilters] = useState({
     sizeMetric: { value: "marla" },
   });
-
-  console.log({ query });
 
   const token = localStorage.getItem("token");
 
@@ -63,6 +68,8 @@ const SearchPage = () => {
       }
     } catch (err) {
       console.log("catch error", err);
+    } finally {
+      setSpinning(false);
     }
   };
 
@@ -84,6 +91,7 @@ const SearchPage = () => {
   const transientBathVal = transientFilters?.bathroom?.value || "";
 
   const getListingBasedOnFilters = async (updatedFilters) => {
+    setSpinning(true);
     const resVal = updatedFilters?.residential?.value || "";
     const bedVal = updatedFilters?.bedroom?.value || "";
     const bathVal = updatedFilters?.bathroom?.value || "";
@@ -104,14 +112,16 @@ const SearchPage = () => {
       const result = await response.json();
       const { success, message, error } = result;
       if (success) {
-        const listings = result.listings || [];
-        console.log("listings", listings);
-        setListings(listings);
+        const apiListings = result.listings || [];
+        console.log("api result", listings);
+        setListings([...apiListings]);
       } else if (error) {
         const details = error?.details[0].message;
       }
     } catch (err) {
       console.log("catch error", err);
+    } finally {
+      setSpinning(false);
     }
   };
 
@@ -277,16 +287,19 @@ const SearchPage = () => {
     ? `${bathroomValue} Bathroom(s)`
     : "Bathroom";
 
+  const isListingFound = listings?.length > 0;
+
   return (
     <SearchPageStyled>
       <Header />
+      <PageLoader spinning={spinning} />
       <SearchPageWrapperStyled>
         <SearchOptionsWrapperStyled>
           <Popover
             content={residentialPlotContent}
             title="Residential"
             trigger="click"
-            placement="bottomRight"
+            placement="bottomLeft"
             open={showPopover?.residential}
           >
             <SearchOptionStyled onClick={onShowPopover("residential")}>
@@ -312,7 +325,7 @@ const SearchPage = () => {
             content={bathRoomContent}
             title="Bathrooms Count"
             trigger="click"
-            placement="bottomRight"
+            placement="bottomLeft"
             open={showPopover?.bathroom}
           >
             <SearchOptionStyled onClick={onShowPopover("bathroom")}>
@@ -341,11 +354,20 @@ const SearchPage = () => {
           <div className="query">{query}</div>
           <div className="count">({listings?.length} properties available)</div>
         </SearchQueryStyled>
-        <SearchListingWrapperStyled>
-          {listings?.map((listing) => {
-            return <Property card={listing} width="330px" />;
-          })}
-        </SearchListingWrapperStyled>
+
+        {isListingFound ? (
+          <SearchListingWrapperStyled>
+            {listings?.map((listing) => {
+              return (
+                <Property card={listing} width="330px" key={listing?._id} />
+              );
+            })}
+          </SearchListingWrapperStyled>
+        ) : (
+          <NoDataFoundImgWrapperStyled>
+            <NoDataFound />
+          </NoDataFoundImgWrapperStyled>
+        )}
       </SearchPageWrapperStyled>
       <Footer />
     </SearchPageStyled>

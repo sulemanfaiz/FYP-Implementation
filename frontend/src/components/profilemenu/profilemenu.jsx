@@ -2,6 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { ProfileMenuItemStyled, ProfileMenuStyled } from "./profilemenu.styles";
 
 const ProfileMenu = () => {
+  const token = localStorage.getItem("token");
+  const isLoggedIn = !!token;
+
   const navigate = useNavigate();
 
   const onMyPropertiesClick = () => {
@@ -19,13 +22,17 @@ const ProfileMenu = () => {
 
   return (
     <ProfileMenuStyled>
-      <ProfileMenuItemStyled>Profile Settings</ProfileMenuItemStyled>
-      <ProfileMenuItemStyled onClick={onMyPropertiesClick}>
-        My Properties
-      </ProfileMenuItemStyled>
-      <ProfileMenuItemStyled onClick={onLikedPropertiesClick}>
-        Liked Properties
-      </ProfileMenuItemStyled>
+      {isLoggedIn && (
+        <>
+          <ProfileMenuItemStyled onClick={onMyPropertiesClick}>
+            My Properties
+          </ProfileMenuItemStyled>
+          <ProfileMenuItemStyled onClick={onLikedPropertiesClick}>
+            Liked Properties
+          </ProfileMenuItemStyled>
+        </>
+      )}
+
       <ProfileMenuItemStyled onClick={onSignOutClick}>
         Sign Out
       </ProfileMenuItemStyled>

@@ -1,20 +1,30 @@
 import {
   balconySvg,
+  basementSvg,
+  cableTvSvg,
+  cctvSvg,
+  centralCoolingSvg,
+  centralHeatingSvg,
+  cornerPlotSvg,
   diningRoomSvg,
   dirtyKitchnSvg,
   drawingRoomSvg,
   electricitySvg,
+  furnishedSvg,
   gasSvg,
   hospitalSvg,
   internetSvg,
   laundryRoomSvg,
   lawnSvg,
+  maintenanceSvg,
   mosqueSvg,
   restaurantSvg,
   schoolSvg,
+  semiFurnishedSvg,
   servantQuaterSvg,
   sewerageSvg,
   storeRoomSvg,
+  swimmingPoolSvg,
   tvLoungeSvg,
   waterSupplySvg,
 } from "../../svgs";
@@ -53,6 +63,33 @@ export const getFeatureIcon = (id) => {
       return dirtyKitchnSvg;
     case "LWN":
       return lawnSvg;
+
+    case "SVQ":
+      return servantQuaterSvg;
+    case "CAB":
+      return cableTvSvg;
+    case "MAI":
+      return maintenanceSvg;
+    case "CCT":
+      return cctvSvg;
+    case "SWP":
+      return swimmingPoolSvg;
+    case "CHT":
+      return centralHeatingSvg;
+    case "CCL":
+      return centralCoolingSvg;
+
+    case "BAL":
+      return balconySvg;
+    case "COR":
+      return cornerPlotSvg;
+    case "BSM":
+      return basementSvg;
+
+    case "FUR":
+      return furnishedSvg;
+    case "SMF":
+      return semiFurnishedSvg;
 
     default:
       break;

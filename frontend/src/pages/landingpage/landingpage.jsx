@@ -128,7 +128,7 @@ const LandingPage = () => {
           <SearchContainer>
             <SearchInput
               type="text"
-              placeholder="Search by city, area, or property..."
+              placeholder="Search by city, area..."
               onChange={(e) => onSearchQueryChange(e?.target?.value)}
             />
             <SearchButton

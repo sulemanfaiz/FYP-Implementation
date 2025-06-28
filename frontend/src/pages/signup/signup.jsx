@@ -16,6 +16,7 @@ import { signupFormSchema } from "../../schema/signupschema";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../hooks/useToast"; // ✅ Import hook
 import { EyeTwoTone, EyeInvisibleOutlined } from "@ant-design/icons";
+import { StyledTextButton } from "../../app.styles";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ const SignUp = () => {
         const { success, message, error, jwtToken, name, email } = result;
 
         if (success) {
-          showSuccess("Signup successful! Welcome to Kiraya Pa");
+          showSuccess("Signup successful! Welcome to Rent A Space");
 
           // ⬇️ SAVE token AND name + email in localStorage
           localStorage.setItem("token", jwtToken);
@@ -79,9 +80,8 @@ const SignUp = () => {
     <SignupPageStyled>
       {/* Left Section */}
       <LeftSectionStyled>
-        <img src="/KirayaPeLogo.png" alt="Logo" className="logo" />
-        <h1>Join Kiraya Pa</h1>
-        <p>Your property, your terms — rent effortlessly!</p>
+        <h1>Join Rent A Space</h1>
+        <p>Your Property, Your Terms — Rent Effortlessly!</p>
       </LeftSectionStyled>
 
       {/* Right Section */}
@@ -96,16 +96,21 @@ const SignUp = () => {
             {/* Name Field */}
             <FormInputWrapperStyled>
               <div className="form-row">
-                <div className="label">Name</div>
+                <div className="label">
+                  Name <span className="star">*</span>
+                </div>
                 <Controller
                   control={control}
                   name="name"
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder="Name"
-                      className="input-field"
-                    />
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <Input
+                        {...field}
+                        placeholder="User"
+                        className="input-field"
+                      />
+                      <div className="error">{error?.message}</div>
+                    </>
                   )}
                 />
               </div>
@@ -114,16 +119,21 @@ const SignUp = () => {
             {/* Email Field */}
             <FormInputWrapperStyled>
               <div className="form-row">
-                <div className="label">Email</div>
+                <div className="label">
+                  Email <span className="star">*</span>
+                </div>
                 <Controller
                   control={control}
                   name="email"
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder="Email"
-                      className="input-field"
-                    />
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <Input
+                        {...field}
+                        placeholder="user@domain.com"
+                        className="input-field"
+                      />
+                      <div className="error">{error?.message}</div>
+                    </>
                   )}
                 />
               </div>
@@ -132,20 +142,31 @@ const SignUp = () => {
             {/* Password Field */}
             <FormInputWrapperStyled>
               <div className="form-row">
-                <div className="label">Password</div>
+                <div className="text-wrapper">
+                  <div className="label">
+                    Password <span className="star">*</span>
+                  </div>
+                  <div className="desc">
+                    Password must contain at least one uppercase, one lowercase,
+                    one number and one special character
+                  </div>
+                </div>
+
                 <Controller
                   control={control}
                   name="password"
-                  render={({ field }) => (
-                    <Input.Password
-                      {...field}
-                      placeholder="Password"
-                      className="input-field"
-                      // 👇 custom icons ↴
-                      iconRender={(visible) =>
-                        visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                      }
-                    />
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <Input.Password
+                        {...field}
+                        placeholder="Password"
+                        className="input-field"
+                        iconRender={(visible) =>
+                          visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                        }
+                      />
+                      <div className="error">{error?.message}</div>
+                    </>
                   )}
                 />
               </div>
@@ -154,16 +175,28 @@ const SignUp = () => {
             {/* Mobile Field */}
             <FormInputWrapperStyled>
               <div className="form-row">
-                <div className="label">Mobile</div>
+                <div className="text-wrapper">
+                  <div className="label">
+                    Mobile <span className="star">*</span>
+                  </div>
+                  <div className="desc">
+                    Enter a valid Pakistani mobile number in international
+                    format (e.g., 923001234567)
+                  </div>
+                </div>
+
                 <Controller
                   control={control}
                   name="mobile"
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder="Mobile"
-                      className="input-field"
-                    />
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <Input
+                        {...field}
+                        className="input-field"
+                        placeholder="Mobile Number"
+                      />
+                      <div className="error">{error?.message}</div>
+                    </>
                   )}
                 />
               </div>
@@ -180,13 +213,13 @@ const SignUp = () => {
             </Button>
 
             {/* Navigate to Login */}
-            <Button
+            <StyledTextButton
               onClick={() => navigate("/login")}
               className="text-button"
               type="default"
             >
               Already have an account? Login
-            </Button>
+            </StyledTextButton>
           </SignupContainerStyled>
         </SignupWrapperStyled>
       </RightSectionStyled>
