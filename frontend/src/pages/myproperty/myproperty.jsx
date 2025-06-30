@@ -1,16 +1,20 @@
 import { useParams } from "react-router-dom";
 import PropertyCard from "../../components/propertycard";
-import StyledTabs from "../../components/styledtabs";
+import parse from "html-react-parser";
+import DOMPurify from "dompurify";
+
 import {
   MyPopertyBannerWrapperStyled,
   MyPopertyPageStyled,
   MyPopertyPageWrapperStyled,
   PropertyListingStyled,
+  PropertyRejectedWrapperStyled,
 } from "./myproperty.styles";
 
 import { useEffect, useState } from "react";
 import PageBanner from "../../components/pagebanner";
 import Header from "../../components/header/header";
+import { ReviewPropertyCard } from "../../components";
 
 const MyPoperties = () => {
   const [property, setProperty] = useState({});
@@ -19,6 +23,10 @@ const MyPoperties = () => {
   const propertyId = params.id;
 
   const token = localStorage.getItem("token");
+  const userInfoInLC = localStorage.getItem("user");
+  const parsedUser = JSON.parse(userInfoInLC);
+
+  const isLoggedInUserIsAdmin = parsedUser?.isAdmin || false;
 
   const getListingDetailBasedOnId = async () => {
     try {
@@ -49,6 +57,30 @@ const MyPoperties = () => {
     getListingDetailBasedOnId();
   }, []);
 
+  const domSanitization = (str) => {
+    try {
+      return DOMPurify.sanitize(str);
+    } catch {
+      return "";
+    }
+  };
+
+  const parseStringToHtml = (text, doDOMSanitization) => {
+    try {
+      const textWithDefaultValue = text || "";
+
+      return parse(
+        doDOMSanitization
+          ? domSanitization(textWithDefaultValue)
+          : textWithDefaultValue
+      );
+    } catch (error) {
+      return text || "";
+    }
+  };
+
+  const isPropertyRejected = property?.adminStatus === "REJ";
+
   return (
     <MyPopertyPageStyled>
       <Header />
@@ -59,8 +91,18 @@ const MyPoperties = () => {
         />
 
         <PropertyListingStyled>
-          <PropertyCard listing={property} showActions />
+          {isLoggedInUserIsAdmin ? (
+            <ReviewPropertyCard listing={property} />
+          ) : (
+            <PropertyCard listing={property} showActions />
+          )}
         </PropertyListingStyled>
+
+        {!isLoggedInUserIsAdmin && isPropertyRejected && (
+          <PropertyRejectedWrapperStyled>
+            {parseStringToHtml(property?.adminComment)}
+          </PropertyRejectedWrapperStyled>
+        )}
       </MyPopertyPageWrapperStyled>
     </MyPopertyPageStyled>
   );

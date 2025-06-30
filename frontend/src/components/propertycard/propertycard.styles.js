@@ -81,6 +81,47 @@ export const MoreButtonWrapperStyled = styled.div`
   right: 20px;
 `;
 
+export const StatusTagStyled = styled.div`
+  position: absolute;
+  right: 20px;
+
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+
+  .anticon-clock-circle {
+    svg {
+      path {
+        fill: orange;
+      }
+    }
+  }
+
+  .anticon-close-circle {
+    svg {
+      path {
+        fill: red;
+      }
+    }
+  }
+  .anticon-check-circle {
+    svg {
+      path {
+        fill: green;
+      }
+    }
+  }
+`;
+
+export const TagStyled = styled.div`
+  color: ${({ color }) => color};
+`;
+
 export const MoreActionItemStyled = styled.p`
   cursor: pointer;
+`;
+
+export const MoreActionWrapperStyled = styled.p`
+  min-width: 150px;
 `;

@@ -26,9 +26,11 @@ const ListingSchema = new Schema({
   // ref: "users",
   // required: true,
 
-  comment: { type: String },
-  reason: { type: String },
-  status: { type: String, default: "ACT" }, // ACT, INA, DFT, etc.
+  userComment: { type: String },
+  userReason: { type: String },
+  adminComment: { type: String },
+  userStatus: { type: String, default: "PEN" }, // ACT, INA, DFT, etc.
+  adminStatus: { type: String, default: "PEN" }, // ACT, INA, DFT, etc.
   features: [
     {
       key: { type: String },

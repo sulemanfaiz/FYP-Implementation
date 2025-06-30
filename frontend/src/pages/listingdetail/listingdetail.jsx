@@ -60,8 +60,8 @@ const ListingDetail = () => {
   const [cords, setCords] = useState();
 
   const getCoordinatesFromAddress = async (address, city) => {
-    // const fullAddress = `${address}, ${city}, Pakistan`;
-    const fullAddress = `international islamic university , islamabad, Pakistan`;
+    const fullAddress = `${address}, ${city}, Pakistan`;
+    // const fullAddress = `Nust H 12, islamabad, Pakistan`;
 
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
       fullAddress
@@ -142,11 +142,12 @@ const ListingDetail = () => {
 
   const isDiscountEnabled = property?.isDiscountEnabled;
 
-  const today = new Date(); // current date
-  const startDate = new Date(property?.discountStartDate);
-  const endDate = new Date(property?.discountEndDate);
+  const todayStr = new Date().toLocaleDateString("en-CA");
 
-  const isDiscountActive = today >= startDate && today <= endDate;
+  const isDiscountActive =
+    todayStr >= property?.discountStartDate &&
+    todayStr <= property?.discountEndDate;
+
   const discountLblText = property?.discountLabel || "Discount";
 
   const latitude = cords?.lat;
@@ -163,6 +164,8 @@ const ListingDetail = () => {
   );
 
   const isPropertyImgExists = property?.fileNames?.length > 0;
+
+  const showDiscount = isDiscountEnabled && isDiscountActive;
 
   return (
     <ListingStyled>
@@ -229,7 +232,7 @@ const ListingDetail = () => {
         {/* Property Details Section */}
         <ListingDetailWrapperStyled>
           <DetailCardStyled>
-            {isDiscountEnabled && (
+            {showDiscount && (
               <DiscountLabelStyled>
                 🏷️
                 {discountLblText} - {property?.discountPercentage}% Off
@@ -264,7 +267,7 @@ const ListingDetail = () => {
 
             <div className="icons-wrapper">
               <div className="icon-item">
-                <RentStyled isDiscounted={isDiscountEnabled}>
+                <RentStyled isDiscounted={showDiscount}>
                   PKR {formatNumberWithCommas(property?.rent)}/Month
                 </RentStyled>
               </div>
@@ -273,7 +276,7 @@ const ListingDetail = () => {
 
           <Divider />
 
-          {isDiscountEnabled && isDiscountActive && (
+          {showDiscount && (
             <>
               <TitleSectionStyled>
                 <h2> Discount Details</h2>

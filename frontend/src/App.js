@@ -19,9 +19,10 @@ import {
   LikedProperties,
   SmartPredictionForm,
   SearchPage,
+  AdminLogin,
+  ReviewListings,
 } from "./pages";
 import Toast from "./components/toast/toast";
-import MapComponent from "./components/mapcomponent";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/add-property" element={<AddListing />} />
             <Route
@@ -45,6 +47,8 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/listing/:id" element={<ListingDetail />} />
             <Route path="/my-properties" element={<MyProperties />} />
+            <Route path="/admin/review-listings" element={<ReviewListings />} />
+            <Route path="/admin/review-listings/:id" element={<MyProperty />} />
             <Route path="/my-properties" element={<MyProperties />} />
             <Route path="/liked-properties" element={<LikedProperties />} />
             <Route path="/my-properties/:id" element={<MyProperty />} />

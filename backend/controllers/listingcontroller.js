@@ -2,7 +2,7 @@ const ListingModel = require("../models/listing");
 const LikedListingModel = require("../models/likedlisting");
 
 const UserModel = require("../models/user");
-
+const sendEmail = require("../utils/Sendemail");
 const mongoose = require("mongoose");
 
 const addListing = async (req, res) => {
@@ -44,7 +44,8 @@ const addListing = async (req, res) => {
       comment: req.body.comment || "",
       reason: req.body.reason || "",
 
-      status: isDraft ? "DFT" : "ACT",
+      userStatus: isDraft ? "DFT" : "PEN",
+      adminStatus: isDraft ? "DFT" : "PEN",
       features: propertyFeatures,
 
       isDiscountEnabled: req.body.isDiscountEnabled === "true",
@@ -56,6 +57,23 @@ const addListing = async (req, res) => {
 
     const listing = new ListingModel(listingData);
     await listing.save();
+    const user = await UserModel.findById(userId); // ⬅ this fetches full user
+    const name = user?.name || "Unknown User"; // fallback if missing
+    const email = user?.email;
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const propertyUrl = `http://localhost:3000/listing/${listing._id}`; // public view
+
+    sendEmail({
+      to: adminEmail,
+      subject: ` New property awaiting approval`,
+      html: `
+    <p>Hi Admin,</p>
+    <p>User <strong>${name}</strong> (${email}) has just added a property titled 
+       "<em>${listing.title}</em>".</p>
+   <p>Please review and take the necessary action in the admin dashboard.</p>
+  <p>🔗 <a href="${propertyUrl}" target="_blank">View Property</a></p>
+  `,
+    }).catch(console.error); // log but don’t crash the request
 
     res
       .status(201)
@@ -81,7 +99,7 @@ const editListing = async (req, res) => {
       });
     }
 
-    // Optional: Check if logged-in user owns this listing
+    // Check if user owns this listing
     if (existingListing.userId.toString() !== userId.toString()) {
       return res.status(403).json({
         message: "You are not authorized to edit this listing",
@@ -91,7 +109,7 @@ const editListing = async (req, res) => {
 
     const propertyFeatures = JSON.parse(req.body.features);
 
-    // Handle new images if uploaded
+    // Handle images
     let updatedFileNames = existingListing.fileNames || [];
     let updatedPaths = existingListing.paths || [];
 
@@ -102,13 +120,40 @@ const editListing = async (req, res) => {
       updatedPaths = [...updatedPaths, ...newPaths];
     }
 
-    // Now update listing
-    await ListingModel.findByIdAndUpdate(id, {
-      ...req.body,
-      fileNames: updatedFileNames,
-      paths: updatedPaths,
-      features: propertyFeatures,
-    });
+    const { status: _ignorerStatus, ...restBody } = req.body;
+
+    // Update listing in DB
+    const updatedListing = await ListingModel.findByIdAndUpdate(
+      id,
+      {
+        ...restBody,
+        fileNames: updatedFileNames,
+        paths: updatedPaths,
+        features: propertyFeatures,
+        userStatus: "PEN",
+        adminStatus: "PEN",
+      },
+      { new: true }
+    );
+
+    // 🔔 Send Email to Admin
+    const user = await UserModel.findById(userId);
+    const name = user?.name || "Unknown User";
+    const email = user?.email;
+    const adminEmail = process.env.ADMIN_EMAIL;
+
+    const propertyUrl = `http://localhost:3000/listing/${id}`; // or /admin/review-listings/${id}
+
+    sendEmail({
+      to: adminEmail,
+      subject: `Listing Edited: Please Review Again`,
+      html: `
+        <p>Hi Admin,</p>
+        <p>User <strong>${name}</strong> (${email}) has <strong>edited</strong> a listing titled "<em>${updatedListing?.title}</em>".</p>
+        <p>Please review the updated property.</p>
+        <p>🔗 <a href="${propertyUrl}" target="_blank">View Edited Property</a></p>
+      `,
+    }).catch(console.error);
 
     res.status(200).json({
       message: "Listing updated successfully",
@@ -199,7 +244,12 @@ const getListingDetail = async (req, res) => {
     res.status(200).json({
       message: "Listing fetched successfully",
       success: true,
-      data: { ...rest, ownerPhone: owner?.mobile },
+      data: {
+        ...rest,
+        ownerPhone: owner?.mobile,
+        ownerName: owner?.name,
+        ownerEmail: owner?.email,
+      },
     });
   } catch (error) {
     console.error("Error fetching user listings:", error);
@@ -219,8 +269,8 @@ const markListingAsInactive = async (req, res) => {
       id,
       {
         status: "INA",
-        comment: comment || "", // if comment is missing, default to empty string
-        reason: reason || "", // if reason is missing, default to empty string
+        userComment: comment || "", // if comment is missing, default to empty string
+        userReason: reason || "", // if reason is missing, default to empty string
       },
       { new: true }
     );

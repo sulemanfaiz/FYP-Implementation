@@ -37,6 +37,10 @@ export const BorderedButtonStyled = styled(Button)`
     cursor: pointer;
     font-size: 1rem;
     box-shadow: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 35px;
 
     &:hover,
     &:active,

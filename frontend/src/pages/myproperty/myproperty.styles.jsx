@@ -13,3 +13,14 @@ export const PropertyListingStyled = styled.div`
     max-width: 100%;
   }
 `;
+
+export const PropertyRejectedWrapperStyled = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+  border-radius: 4px;
+  padding: 12px;
+  margin-top: 20px;
+  border: 1px solid rgb(242, 242, 242);
+`;

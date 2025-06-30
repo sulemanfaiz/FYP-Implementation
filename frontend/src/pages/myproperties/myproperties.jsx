@@ -60,52 +60,26 @@ const MyPoperties = (props) => {
     setTab(key);
   };
 
-  const allListings = listings;
-
-  const activeListings = listings.filter(
-    (listing) => listing?.status === "ACT"
-  );
-
-  const inActiveListings = listings.filter(
-    (listing) => listing?.status === "INA"
-  );
-
-  const draftListings = listings.filter((listing) => listing?.status === "DFT");
-
-  const isAllActiveTab = tab === "1";
-  const isActiveTab = tab === "2";
-  const isDraftTab = tab === "3";
-
-  const userProperties = isAllActiveTab
-    ? allListings
-    : isActiveTab
-    ? activeListings
-    : isDraftTab
-    ? draftListings
-    : inActiveListings;
+  const statusFilters = {
+    1: () => listings, // All Listings
+    2: () => listings?.filter((l) => l?.adminStatus === "APR"),
+    3: () => listings?.filter((l) => l?.adminStatus === "PEN"),
+    4: () => listings?.filter((l) => l?.adminStatus === "REJ"),
+    5: () => listings?.filter((l) => l?.userStatus === "DFT"),
+    6: () => listings?.filter((l) => l?.userStatus === "INA"),
+  };
 
   const items = [
-    {
-      key: "1",
-      label: "All Listings",
-      children: <PropertyListing listings={userProperties} />,
-    },
-    {
-      key: "2",
-      label: "Active Listings",
-      children: <PropertyListing listings={userProperties} />,
-    },
-    {
-      key: "3",
-      label: "Draft Listings",
-      children: <PropertyListing listings={userProperties} />,
-    },
-    {
-      key: "4",
-      label: "In-Active Listings",
-      children: <PropertyListing listings={userProperties} />,
-    },
-  ];
+    { key: "1", label: "All Listings" },
+    { key: "2", label: "Active Listings" },
+    { key: "3", label: "Pending Listings" },
+    { key: "4", label: "Rejected Listings" },
+    { key: "5", label: "Draft Listings" },
+    { key: "6", label: "In-Active Listings" },
+  ]?.map((item) => ({
+    ...item,
+    children: <PropertyListing listings={statusFilters[item?.key]?.() || []} />,
+  }));
 
   const token = localStorage.getItem("token");
 
