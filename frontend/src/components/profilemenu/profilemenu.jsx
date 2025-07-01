@@ -5,10 +5,19 @@ const ProfileMenu = () => {
   const token = localStorage.getItem("token");
   const isLoggedIn = !!token;
 
+  const userInfoInLC = localStorage.getItem("user");
+  const parsedUser = JSON.parse(userInfoInLC);
+
+  const isLoggedInUserIsAdmin = parsedUser?.isAdmin || false;
+
   const navigate = useNavigate();
 
   const onMyPropertiesClick = () => {
     navigate("/my-properties/");
+  };
+
+  const onReviewPropertiesClick = () => {
+    navigate("/admin/review-listings/");
   };
 
   const onLikedPropertiesClick = () => {
@@ -24,12 +33,20 @@ const ProfileMenu = () => {
     <ProfileMenuStyled>
       {isLoggedIn && (
         <>
-          <ProfileMenuItemStyled onClick={onMyPropertiesClick}>
-            My Properties
-          </ProfileMenuItemStyled>
-          <ProfileMenuItemStyled onClick={onLikedPropertiesClick}>
-            Liked Properties
-          </ProfileMenuItemStyled>
+          {isLoggedInUserIsAdmin ? (
+            <ProfileMenuItemStyled onClick={onReviewPropertiesClick}>
+              Review Properties
+            </ProfileMenuItemStyled>
+          ) : (
+            <>
+              <ProfileMenuItemStyled onClick={onMyPropertiesClick}>
+                My Properties
+              </ProfileMenuItemStyled>
+              <ProfileMenuItemStyled onClick={onLikedPropertiesClick}>
+                Liked Properties
+              </ProfileMenuItemStyled>
+            </>
+          )}
         </>
       )}
 

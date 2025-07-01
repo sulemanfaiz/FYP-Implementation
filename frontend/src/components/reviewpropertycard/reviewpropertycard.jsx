@@ -4,36 +4,50 @@ import {
   propertyOptions,
 } from "../../pages/addlisting/addlisting.config";
 import {
-  ImgStyled,
-  ImgWrapperStyled,
-  MenuWrapperStyled,
-  MoreActionItemStyled,
-  MoreActionWrapperStyled,
-  MoreButtonWrapperStyled,
-  PropertyCardWrapperStyled,
-  PropertyStatusTagStyled,
   ReviewPropertyCardWrapperStyled,
-  RowStyled,
-  RowWrapperStyled,
-  SectionStyled,
-  SectionsWrapperStyled,
-  TitleStyled,
+  CardHeaderStyled,
+  StatusBadgeStyled,
+  ActionButtonStyled,
+  CardContentStyled,
+  ImageGalleryStyled,
+  PropertyImageStyled,
+  InfoSectionStyled,
+  InfoGridStyled,
+  InfoItemStyled,
+  SectionTitleStyled,
+  DescriptionStyled,
+  FeaturesGridStyled,
+  FeatureTagStyled,
+  OwnerInfoStyled,
+  PriceDisplayStyled,
+  DiscountBadgeStyled,
+  MoreActionsStyled,
+  ActionItemStyled,
 } from "./reviewpropertycard.styles";
 
-import { Button, ConfigProvider, Flex, Popover } from "antd";
+import { Button, Popover, Tag, Tooltip, Divider } from "antd";
 import { useState } from "react";
 import SetAsInActiveModal from "../setasinactivemodal/setasinactivemodal";
-import { BorderedButtonStyled } from "../../app.styles";
 import ApproveListingModal from "../approvemodal";
 import RejectListingModal from "../rejectmodal";
 
-import { CheckCircleOutlined } from "@ant-design/icons";
-import { ClockCircleOutlined } from "@ant-design/icons";
-import { CloseCircleOutlined } from "@ant-design/icons";
 import {
-  StatusTagStyled,
-  TagStyled,
-} from "../propertycard/propertycard.styles";
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  EyeOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  MoreOutlined,
+  HomeOutlined,
+  EnvironmentOutlined,
+  DollarOutlined,
+  UserOutlined,
+  PhoneOutlined,
+  MailOutlined,
+  CalendarOutlined,
+  StarOutlined,
+} from "@ant-design/icons";
 
 const MoreActions = (props) => {
   const { property, propertyId } = props || {};
@@ -41,54 +55,52 @@ const MoreActions = (props) => {
   const [isApproveModalVisible, setIsApproveModalVisible] = useState(false);
   const [isRejectModalVisible, setIsRejectModalVisible] = useState(false);
 
-  const userInfoInLC = localStorage.getItem("user");
-  const parsedUser = JSON.parse(userInfoInLC);
-
   const onApproveClick = () => {
-    setIsApproveModalVisible(true); // Show the modal
+    setIsApproveModalVisible(true);
   };
 
   const handleApproveModalClose = () => {
-    setIsApproveModalVisible(false); // Close the modal without submission
+    setIsApproveModalVisible(false);
   };
 
   const handleApprove = (data) => {
-    setIsApproveModalVisible(false); // Close the modal after submission
+    setIsApproveModalVisible(false);
   };
 
   const onRejectClick = () => {
-    setIsRejectModalVisible(true); // Show the modal
+    setIsRejectModalVisible(true);
   };
 
   const handleRejectModalClose = () => {
-    setIsRejectModalVisible(false); // Close the modal without submission
+    setIsRejectModalVisible(false);
   };
 
   const handleReject = (data) => {
-    setIsRejectModalVisible(false); // Close the modal after submission
+    setIsRejectModalVisible(false);
   };
 
   const onViewClick = () => {
-    navigate(`/listing/${propertyId}`); // Navigate to the ListingDetail page with the property ID
+    navigate(`/listing/${propertyId}`);
   };
 
-  const isPropertyApproved = property?.adminStatus === "APR";
-  const isPropertyRejected = property?.adminStatus === "REJ";
+  const isPropertyPending = property?.adminStatus === "PEN";
 
   return (
-    <MoreActionWrapperStyled>
-      <MoreActionItemStyled onClick={onViewClick}>View</MoreActionItemStyled>
+    <MoreActionsStyled>
+      <ActionItemStyled onClick={onViewClick}>
+        <EyeOutlined /> View Details
+      </ActionItemStyled>
 
-      {!isPropertyApproved && !isPropertyRejected && (
-        <MoreActionItemStyled onClick={onApproveClick}>
-          Approve
-        </MoreActionItemStyled>
+      {isPropertyPending && (
+        <ActionItemStyled onClick={onApproveClick} className="approve">
+          <CheckOutlined /> Approve
+        </ActionItemStyled>
       )}
 
-      {!isPropertyRejected && !isPropertyApproved && (
-        <MoreActionItemStyled onClick={onRejectClick}>
-          Reject
-        </MoreActionItemStyled>
+      {isPropertyPending && (
+        <ActionItemStyled onClick={onRejectClick} className="reject">
+          <CloseOutlined /> Reject
+        </ActionItemStyled>
       )}
 
       <ApproveListingModal
@@ -101,7 +113,7 @@ const MoreActions = (props) => {
         onClose={handleRejectModalClose}
         onSubmit={handleReject}
       />
-    </MoreActionWrapperStyled>
+    </MoreActionsStyled>
   );
 };
 
@@ -141,200 +153,213 @@ const ReviewPropertyCard = (props) => {
 
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
-  const tagLabel = {
-    APR: "Approved",
-    PEN: "Pending",
-    REJ: "Rejected",
+  const statusConfig = {
+    APR: {
+      label: "Approved",
+      color: "success",
+      icon: <CheckCircleOutlined />,
+      bgColor: "#f6ffed",
+      borderColor: "#b7eb8f",
+    },
+    PEN: {
+      label: "Pending Review",
+      color: "warning",
+      icon: <ClockCircleOutlined />,
+      bgColor: "#fffbe6",
+      borderColor: "#ffe58f",
+    },
+    REJ: {
+      label: "Rejected",
+      color: "error",
+      icon: <CloseCircleOutlined />,
+      bgColor: "#fff2f0",
+      borderColor: "#ffccc7",
+    },
   };
 
-  const tagColor = {
-    APR: "green",
-    PEN: "orange",
-    REJ: "red",
-  };
-
-  const tagIcon = {
-    APR: <CheckCircleOutlined />,
-    PEN: <ClockCircleOutlined />,
-    REJ: <CloseCircleOutlined />,
-  };
-
-  const statusTag = tagLabel[listing?.adminStatus];
-  const statusTagIcon = tagIcon[listing?.adminStatus];
-  const tagClr = tagColor[listing?.adminStatus];
-
+  const status = statusConfig[listing?.adminStatus] || statusConfig.PEN;
   const content = <MoreActions propertyId={listing?._id} property={listing} />;
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-PK", {
+      style: "currency",
+      currency: "PKR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
 
   return (
     <ReviewPropertyCardWrapperStyled>
-      <MenuWrapperStyled>
-        <PropertyStatusTagStyled>
-          <div className="icon">{statusTagIcon}</div>
-          <TagStyled color={tagClr}> {statusTag}</TagStyled>
-        </PropertyStatusTagStyled>
-        <MoreButtonWrapperStyled>
-          <Popover placement="bottomRight" title="" content={content}>
-            <BorderedButtonStyled>More</BorderedButtonStyled>
-          </Popover>
-        </MoreButtonWrapperStyled>
-      </MenuWrapperStyled>
+      {/* Header with Status and Actions */}
+      <CardHeaderStyled>
+        <StatusBadgeStyled
+          color={status.color}
+          icon={status.icon}
+          style={{
+            backgroundColor: status.bgColor,
+            borderColor: status.borderColor,
+            border: `1px solid ${status.borderColor}`,
+          }}
+        >
+          {status.label}
+        </StatusBadgeStyled>
 
-      <PropertyCardWrapperStyled onClick={propsOnClick}>
-        <SectionsWrapperStyled>
-          <SectionStyled>
-            <TitleStyled>Property Summary</TitleStyled>
+        <Popover
+          placement="bottomRight"
+          title="Actions"
+          content={content}
+          trigger="click"
+        >
+          <ActionButtonStyled>
+            <MoreOutlined />
+          </ActionButtonStyled>
+        </Popover>
+      </CardHeaderStyled>
 
-            <RowWrapperStyled>
-              <RowStyled>
-                <div className="key">Title</div>
-                <div className="value">{title}</div>
-              </RowStyled>
+      <CardContentStyled onClick={propsOnClick}>
+        {/* Property Images */}
+        {imgExists && (
+          <ImageGalleryStyled>
+            {fileNames?.slice(0, 3).map((path, index) => (
+              <PropertyImageStyled
+                key={`${path}-${index}`}
+                src={`${API_URL}/uploads/${path}`}
+                alt={`Property ${index + 1}`}
+              />
+            ))}
+            {fileNames?.length > 3 && (
+              <PropertyImageStyled className="more-images">
+                +{fileNames.length - 3} more
+              </PropertyImageStyled>
+            )}
+          </ImageGalleryStyled>
+        )}
 
-              <RowStyled>
-                <div className="key">Type</div>
-                <div className="value">{propertyTypeText}</div>
-              </RowStyled>
+        {/* Property Information */}
+        <InfoSectionStyled>
+          <div className="main-info">
+            <h3 className="property-title">{title}</h3>
+            <p className="property-location">
+              <EnvironmentOutlined /> {adress}, {city}
+            </p>
 
-              <RowStyled>
-                <div className="key">Adress</div>
-                <div className="value">{adress}</div>
-              </RowStyled>
-
-              <RowStyled>
-                <div className="key">City</div>
-                <div className="value">{city}</div>
-              </RowStyled>
-
-              <RowStyled>
-                <div className="key">Area</div>
-                <div className="value">
-                  {areaSizeUnit + " " + propertyAreaText}
-                </div>
-              </RowStyled>
-
-              <RowStyled>
-                <div className="key">Bedroom Count</div>
-                <div className="value">{bedrooms}</div>
-              </RowStyled>
-
-              <RowStyled>
-                <div className="key">Bathroom Count</div>
-                <div className="value">{bathrooms}</div>
-              </RowStyled>
-
-              <RowStyled>
-                <div className="key">Garage Count</div>
-                <div className="value">{garages}</div>
-              </RowStyled>
-            </RowWrapperStyled>
-          </SectionStyled>
-        </SectionsWrapperStyled>
-
-        <SectionsWrapperStyled>
-          <SectionStyled>
-            <TitleStyled>Description</TitleStyled>
-
-            <RowWrapperStyled>
-              <RowStyled>
-                <div className="key">Description</div>
-                <div className="value" title={desc}>
-                  {desc}
-                </div>
-              </RowStyled>
-
-              <RowStyled>
-                <div className="key">Year Built</div>
-                <div className="value">{yearBuilt}</div>
-              </RowStyled>
-
-              <RowStyled>
-                <div className="key">Rent Price</div>
-                <div className="value">{rent}</div>
-              </RowStyled>
-
-              <RowStyled>
-                <div className="key">Is Discount Enabled</div>
-                <div className="value">{isDiscountEnabled ? "✅" : "❌"}</div>
-              </RowStyled>
-
+            <PriceDisplayStyled>
+              <span className="price">{formatPrice(rent)}</span>
+              <span className="period">/month</span>
               {isDiscountEnabled && (
-                <RowStyled>
-                  <div className="key">Discount Percentage</div>
-                  <div className="value">{listing?.discountPercentage}</div>
-                </RowStyled>
+                <DiscountBadgeStyled>
+                  {listing?.discountPercentage}% OFF
+                </DiscountBadgeStyled>
               )}
-            </RowWrapperStyled>
-          </SectionStyled>
-        </SectionsWrapperStyled>
-      </PropertyCardWrapperStyled>
+            </PriceDisplayStyled>
+          </div>
 
-      <PropertyCardWrapperStyled>
-        <SectionsWrapperStyled>
-          <SectionStyled>
-            <TitleStyled>Features</TitleStyled>
+          <InfoGridStyled>
+            <InfoItemStyled>
+              <HomeOutlined />
+              <div>
+                <span className="label">Type</span>
+                <span className="value">{propertyTypeText}</span>
+              </div>
+            </InfoItemStyled>
 
-            <RowWrapperStyled>
-              <RowWrapperStyled>
-                {features?.map((amenity) => {
-                  return (
-                    <RowStyled key={amenity?.key}>
-                      <div className="key">{amenity?.label}</div>
-                      <div className="value">
-                        {amenity?.count ? amenity?.count : "✅"}
-                      </div>
-                    </RowStyled>
-                  );
-                })}
-              </RowWrapperStyled>
-            </RowWrapperStyled>
-          </SectionStyled>
-        </SectionsWrapperStyled>
+            <InfoItemStyled>
+              <StarOutlined />
+              <div>
+                <span className="label">Area</span>
+                <span className="value">
+                  {areaSizeUnit} {propertyAreaText}
+                </span>
+              </div>
+            </InfoItemStyled>
 
-        <SectionsWrapperStyled>
-          <SectionStyled>
-            <TitleStyled>Owner Info</TitleStyled>
+            <InfoItemStyled>
+              <span className="icon">🛏️</span>
+              <div>
+                <span className="label">Bedrooms</span>
+                <span className="value">{bedrooms}</span>
+              </div>
+            </InfoItemStyled>
 
-            <RowWrapperStyled>
-              <RowStyled>
-                <div className="key">Name</div>
-                <div className="value">{ownerName}</div>
-              </RowStyled>
+            <InfoItemStyled>
+              <span className="icon">🚿</span>
+              <div>
+                <span className="label">Bathrooms</span>
+                <span className="value">{bathrooms}</span>
+              </div>
+            </InfoItemStyled>
 
-              <RowStyled>
-                <div className="key">Email</div>
-                <div className="value">{ownerEmail}</div>
-              </RowStyled>
+            {garages > 0 && (
+              <InfoItemStyled>
+                <span className="icon">🚗</span>
+                <div>
+                  <span className="label">Garages</span>
+                  <span className="value">{garages}</span>
+                </div>
+              </InfoItemStyled>
+            )}
 
-              <RowStyled>
-                <div className="key">Phone</div>
-                <div className="value">{ownerPhone}</div>
-              </RowStyled>
-            </RowWrapperStyled>
-          </SectionStyled>
-        </SectionsWrapperStyled>
-      </PropertyCardWrapperStyled>
-      <PropertyCardWrapperStyled>
-        <SectionsWrapperStyled>
-          <SectionStyled>
-            <TitleStyled>Images</TitleStyled>
+            {yearBuilt && (
+              <InfoItemStyled>
+                <CalendarOutlined />
+                <div>
+                  <span className="label">Year Built</span>
+                  <span className="value">{yearBuilt}</span>
+                </div>
+              </InfoItemStyled>
+            )}
+          </InfoGridStyled>
 
-            <ImgWrapperStyled>
-              {fileNames?.map((path, index) => (
-                // <ImgWrapperStyled
-                //   key={`${path}-${index}`}
-                //   className="small-image"
-                // >
-                <ImgStyled
-                  src={`${API_URL}/uploads/${path}`}
-                  alt={`Property ${index}`}
-                  key={`${path}-${index}`}
-                />
-                // </ImgWrapperStyled>
-              ))}
-            </ImgWrapperStyled>
-          </SectionStyled>
-        </SectionsWrapperStyled>
-      </PropertyCardWrapperStyled>
+          {/* Description */}
+          {desc && (
+            <DescriptionStyled>
+              <SectionTitleStyled>Description</SectionTitleStyled>
+              <p>{desc}</p>
+            </DescriptionStyled>
+          )}
+
+          {/* Features */}
+          {features?.length > 0 && (
+            <div className="features-section">
+              <SectionTitleStyled>Features & Amenities</SectionTitleStyled>
+              <FeaturesGridStyled>
+                {features?.map((amenity) => (
+                  <FeatureTagStyled key={amenity?.key}>
+                    {amenity?.label}
+                    {amenity?.count > 1 && (
+                      <span className="count">({amenity?.count})</span>
+                    )}
+                  </FeatureTagStyled>
+                ))}
+              </FeaturesGridStyled>
+            </div>
+          )}
+
+          <Divider />
+
+          {/* Owner Information */}
+          <OwnerInfoStyled>
+            <SectionTitleStyled>
+              <UserOutlined /> Property Owner
+            </SectionTitleStyled>
+            <div className="owner-details">
+              <div className="owner-item">
+                <UserOutlined />
+                <span>{ownerName}</span>
+              </div>
+              <div className="owner-item">
+                <MailOutlined />
+                <span>{ownerEmail}</span>
+              </div>
+              <div className="owner-item">
+                <PhoneOutlined />
+                <span>{ownerPhone}</span>
+              </div>
+            </div>
+          </OwnerInfoStyled>
+        </InfoSectionStyled>
+      </CardContentStyled>
     </ReviewPropertyCardWrapperStyled>
   );
 };

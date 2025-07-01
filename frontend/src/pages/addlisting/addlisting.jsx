@@ -72,6 +72,11 @@ const AddListingContent = (props) => {
     status,
     fileNames: alreadyUploadedImages,
     features = [],
+    isSeasonalDiscount = false,
+    discountEndDate,
+    discountLabel = "",
+    discountPercentage = "",
+    discountStartDate,
   } = property || {};
 
   const {
@@ -100,6 +105,11 @@ const AddListingContent = (props) => {
       houseNo,
       status,
       features,
+      isSeasonalDiscount,
+      discountEndDate,
+      discountLabel,
+      discountPercentage,
+      discountStartDate,
     },
     mode: "onChange",
     resolver: yupResolver(addListingSchema),

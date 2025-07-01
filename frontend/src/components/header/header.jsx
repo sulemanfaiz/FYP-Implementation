@@ -29,6 +29,8 @@ const Header = () => {
 
   const profileContent = <ProfileMenu />;
 
+  const isLoggedInUserIsAdmin = parsedUser?.isAdmin || false;
+
   return (
     <HeaderStyled>
       <HeaderContainer>
@@ -38,9 +40,12 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <NavLinks>
-          <NavItem onClick={() => navigate("/add-property")}>
-            List It Now
-          </NavItem>
+          {!isLoggedInUserIsAdmin && (
+            <NavItem onClick={() => navigate("/add-property")}>
+              List It Now
+            </NavItem>
+          )}
+
           <NavItem onClick={() => navigate("/about-us")}>About Us</NavItem>
           <NavItem onClick={() => navigate("/smart-rent-ai")}>
             SmartRent AI
@@ -72,14 +77,17 @@ const Header = () => {
       {/* Mobile Navigation (only visible when menu is open) */}
       {mobileMenuOpen && (
         <MobileNavLinks>
-          <NavItem
-            onClick={() => {
-              navigate("/add-property");
-              setMobileMenuOpen(false);
-            }}
-          >
-            List It Now
-          </NavItem>
+          {!isLoggedInUserIsAdmin && (
+            <NavItem
+              onClick={() => {
+                navigate("/add-property");
+                setMobileMenuOpen(false);
+              }}
+            >
+              List It Now
+            </NavItem>
+          )}
+
           <NavItem
             onClick={() => {
               navigate("/about-us");

@@ -191,7 +191,7 @@ const getListing = async (req, res) => {
 
 const getAllListings = async (req, res) => {
   try {
-    const listings = await ListingModel.find(); // no filter, get everything
+    const listings = await ListingModel.find({ adminStatus: "APR" });
 
     let likedListingIds = [];
 

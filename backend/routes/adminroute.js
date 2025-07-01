@@ -11,7 +11,7 @@ const router = require("express").Router();
 
 router.post("/admin-login", loginValidation, adminLogin);
 
-router.get("/get-review-listings", loginValidation, getAllSubmittedListings);
+router.get("/get-review-listings", verifyToken, getAllSubmittedListings);
 router.patch("/approve-listing/:id", verifyToken, approveListing);
 router.patch("/reject-listing/:id", verifyToken, rejectListing);
 

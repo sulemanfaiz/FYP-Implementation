@@ -37,6 +37,7 @@ export const FormInputWrapperStyled = styled.div`
     color: #37474f;
     display: flex;
     align-items: center;
+    margin-bottom: 0.5rem;
 
     @media ${devices.mobile} {
       font-size: 1rem;
@@ -67,6 +68,7 @@ export const FormInputWrapperStyled = styled.div`
     width: 100%;
     max-width: 350px;
     height: 3rem;
+    margin-left: 0;
 
     .ant-select-selector {
       &:focus,
@@ -88,6 +90,7 @@ export const FormInputWrapperStyled = styled.div`
     width: 100%;
     max-width: 150px;
     height: 3rem;
+    margin-left: 0;
 
     .ant-select-selector {
       &:focus,
@@ -109,9 +112,38 @@ export const FormInputWrapperStyled = styled.div`
     width: 100%;
     max-width: 350px;
     height: 3rem;
+    margin-left: 0;
 
     @media ${devices.mobile} {
       max-width: 100%;
+    }
+  }
+
+  /* Only adding error message styling - keeping original design intact */
+  .error-message {
+    color: #ff4d4f;
+    font-size: 12px;
+    margin-top: 4px;
+    margin-left: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    animation: fadeIn 0.3s ease;
+
+    &::before {
+      content: "⚠";
+      font-size: 14px;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 `;

@@ -134,8 +134,8 @@ export const SignupContainerStyled = styled.div`
   gap: 0.5rem;
 
   .signup-button {
-    background-color: #e85451;
-    color: white;
+    background-color: #e85451 !important;
+    color: white !important;
     font-weight: bold;
     padding: 20px 20px;
     border-radius: 4px;
@@ -147,7 +147,14 @@ export const SignupContainerStyled = styled.div`
     align-self: center;
 
     &:hover {
-      background-color: #d43e3a;
+      background-color: #d43e3a !important;
+      color: white !important;
+    }
+    :hover,
+    :active,
+    :focus {
+      text-decoration: underline;
+      color: #e85451;
     }
   }
 

@@ -60,8 +60,6 @@ const getAllSubmittedListings = async (req, res) => {
 
 const approveListing = async (req, res) => {
   const listingId = req.params.id;
-  console.log("BODY:", req.body);
-  const { adminMessage } = req.body || {}; // admin's custom description // admin's custom description
 
   try {
     const listing = await ListingModel.findByIdAndUpdate(
@@ -69,7 +67,6 @@ const approveListing = async (req, res) => {
       {
         adminStatus: "APR",
         reviewedAt: new Date(),
-        adminMessage,
       },
       { new: true }
     );
@@ -83,6 +80,7 @@ const approveListing = async (req, res) => {
 
     // Get the user who uploaded the property
     const user = await UserModel.findById(listing.userId);
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -113,14 +111,10 @@ const approveListing = async (req, res) => {
           <li><strong>Approved on:</strong> ${new Date().toLocaleDateString()}</li>
         </ul>
 
-        ${
-          adminMessage
-            ? `
+        
               <h4>Message from Admin:</h4>
-              <p>${adminMessage}</p>
-            `
-            : ""
-        }
+              <p>Reviewed And Approved!</p>
+             
 
         <p>
           🎉 <strong>Congratulations!</strong> Your property is now live and
