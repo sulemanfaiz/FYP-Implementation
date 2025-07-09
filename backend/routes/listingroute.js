@@ -9,6 +9,8 @@ const {
   searchListings,
   detailedFilterListings,
   addListing,
+  unlockWhatsApp,
+  featureProperty,
 } = require("../controllers/listingcontroller");
 
 const { verifyToken, safeVerifyToken } = require("../middlewares/auth");
@@ -51,5 +53,9 @@ router.get("/get-listing-detail/:id", safeVerifyToken, getListingDetail);
 router.get("/search", safeVerifyToken, searchListings);
 
 router.get("/filtered-search", safeVerifyToken, detailedFilterListings);
+
+router.post("/unlock-whatsapp/:id", verifyToken, unlockWhatsApp);
+
+router.post("/feature/:id", verifyToken, featureProperty);
 
 module.exports = router;

@@ -19,4 +19,5 @@ const likedListingSchema = new Schema({
 });
 
 const LikedListingModel = mongoose.model("likedlisting", likedListingSchema);
+mongoose.model("LikedListing", likedListingSchema); // Register as 'LikedListing' for population compatibility
 module.exports = LikedListingModel;

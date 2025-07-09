@@ -6,25 +6,28 @@ import {
 import {
   MoreActionItemStyled,
   MoreActionWrapperStyled,
-  MoreButtonStyled,
   MoreButtonWrapperStyled,
   PropertyCardWrapperStyled,
   StatusTagStyled,
   TagStyled,
+  PremiumBadgeStyled,
+  ImageContainerStyled,
+  SoldBannerStyled,
 } from "./propertycard.styles";
 
-import { Button, ConfigProvider, Flex, Popover } from "antd";
+import { Popover, Button, message } from "antd";
 import { useState } from "react";
 import SetAsInActiveModal from "../setasinactivemodal/setasinactivemodal";
 import { formatNumberWithCommas } from "../../utils/numberformatter";
-import { TypeOfPropertyStyled } from "../../pages/listingdetail/listingdetailstyles";
 import { BorderedButtonStyled } from "../../app.styles";
 import ApproveListingModal from "../approvemodal";
 import RejectListingModal from "../rejectmodal";
 
-import { CheckCircleOutlined } from "@ant-design/icons";
-import { ClockCircleOutlined } from "@ant-design/icons";
-import { CloseCircleOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+} from "@ant-design/icons";
 
 const MoreActions = (props) => {
   const { propertyId } = props || {};
@@ -47,42 +50,42 @@ const MoreActions = (props) => {
   };
 
   const onApproveClick = () => {
-    setIsApproveModalVisible(true); // Show the modal
+    setIsApproveModalVisible(true);
   };
 
   const handleApproveModalClose = () => {
-    setIsApproveModalVisible(false); // Close the modal without submission
+    setIsApproveModalVisible(false);
   };
 
   const handleApprove = (data) => {
-    setIsApproveModalVisible(false); // Close the modal after submission
+    setIsApproveModalVisible(false);
   };
 
   const onRejectClick = () => {
-    setIsRejectModalVisible(true); // Show the modal
+    setIsRejectModalVisible(true);
   };
 
   const handleRejectModalClose = () => {
-    setIsRejectModalVisible(false); // Close the modal without submission
+    setIsRejectModalVisible(false);
   };
 
   const handleReject = (data) => {
-    setIsRejectModalVisible(false); // Close the modal after submission
+    setIsRejectModalVisible(false);
   };
 
   const onMarkInactiveClick = () => {
-    setIsModalVisible(true); // Show the modal
+    setIsModalVisible(true);
   };
   const handleModalSubmit = (data) => {
-    setIsModalVisible(false); // Close the modal after submission
+    setIsModalVisible(false);
   };
 
   const handleModalClose = () => {
-    setIsModalVisible(false); // Close the modal without submission
+    setIsModalVisible(false);
   };
 
   const onViewClick = () => {
-    navigate(`/listing/${propertyId}`); // Navigate to the ListingDetail page with the property ID
+    navigate(`/listing/${propertyId}`);
   };
 
   return (
@@ -134,8 +137,17 @@ const MoreActions = (props) => {
 };
 
 const PropertyCard = (props) => {
-  const { listing, propsOnClick, showActions } = props || {};
   const {
+    listing,
+    showActions,
+    propsOnClick,
+    showFeatureButton,
+    onFeatureSuccess,
+  } = props || {};
+  const navigate = useNavigate();
+  const [featuring, setFeaturing] = useState(false);
+  const {
+    _id,
     rent,
     title,
     desc = "",
@@ -145,6 +157,8 @@ const PropertyCard = (props) => {
     areaSizeUnit,
     areaSizeMetric,
     fileNames,
+    isPremium,
+    adminStatus,
   } = listing || {};
 
   const imgExists = fileNames?.length > 0;
@@ -158,7 +172,7 @@ const PropertyCard = (props) => {
     areaSizeOptions?.find((property) => property.value === areaSizeMetric)
       ?.label || "";
 
-  const content = <MoreActions propertyId={listing?._id} />;
+  const content = <MoreActions propertyId={_id} />;
 
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
@@ -169,9 +183,9 @@ const PropertyCard = (props) => {
   };
 
   const tagColor = {
-    APR: "green",
-    PEN: "orange",
-    REJ: "red",
+    APR: "#52c41a",
+    PEN: "#faad14",
+    REJ: "#ff4d4f",
   };
 
   const tagIcon = {
@@ -180,71 +194,172 @@ const PropertyCard = (props) => {
     REJ: <CloseCircleOutlined />,
   };
 
-  const statusTag = tagLabel[listing?.adminStatus];
-  const statusTagIcon = tagIcon[listing?.adminStatus];
-  const tagClr = tagColor[listing?.adminStatus];
+  const statusTag = tagLabel[adminStatus];
+  const statusTagIcon = tagIcon[adminStatus];
+  const tagClr = tagColor[adminStatus];
+
+  const token = localStorage.getItem("token");
+
+  const handleFeatureProperty = async (e) => {
+    e.stopPropagation(); // Prevent card click event
+    setFeaturing(true);
+    try {
+      const response = await fetch(`${API_URL}/listing/feature/${_id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        message.success("Property featured successfully!");
+        if (onFeatureSuccess) {
+          onFeatureSuccess(); // Callback to refresh the list
+        }
+      } else {
+        message.error(result.message || "Failed to feature property.");
+      }
+    } catch (error) {
+      message.error("An error occurred while featuring the property.");
+      console.error("Feature property error:", error);
+    } finally {
+      setFeaturing(false);
+    }
+  };
+
+  const handleCardClick = () => {
+    if (propsOnClick) {
+      propsOnClick();
+    } else if (_id) {
+      navigate(`/listing/${_id}`);
+    }
+  };
+
+  const isSold = listing?.isRented || listing?.status === "sold";
 
   return (
-    <PropertyCardWrapperStyled onClick={propsOnClick} className="property-card">
+    <PropertyCardWrapperStyled
+      onClick={handleCardClick}
+      className="property-card"
+    >
+      {/* More Actions Button - positioned on the card */}
       {showActions && (
-        <MoreButtonWrapperStyled>
-          <Popover placement="bottomRight" title="" content={content}>
+        <MoreButtonWrapperStyled onClick={(e) => e.stopPropagation()}>
+          <Popover
+            placement="bottomRight"
+            title=""
+            content={content}
+            trigger="click"
+          >
             <BorderedButtonStyled>More</BorderedButtonStyled>
           </Popover>
         </MoreButtonWrapperStyled>
       )}
-      {!showActions && (
-        <StatusTagStyled>
-          <div className="icon">{statusTagIcon}</div>
-          <TagStyled color={tagClr}> {statusTag}</TagStyled>
-        </StatusTagStyled>
-      )}
 
-      <div className="img-section">
+      {/* Image Container with Premium Badge */}
+      <ImageContainerStyled>
         {imgExists ? (
           <img
             className="property-image"
             src={`${API_URL}/uploads/${path}`}
-            alt="property-image"
+            alt={title}
           />
         ) : (
-          <img src="/property/adminpropertyimg.jpg" alt="Banner" />
+          <img src="/property/adminpropertyimg.jpg" alt="Default property" />
         )}
-      </div>
+        {isSold && <SoldBannerStyled>SOLD</SoldBannerStyled>}
+        {isPremium && <PremiumBadgeStyled>Premium</PremiumBadgeStyled>}
+      </ImageContainerStyled>
 
+      {/* Info Section */}
       <div className="info-section">
-        <div className="price">PKR {formatNumberWithCommas(rent)}</div>
+        {/* Price and Status Row */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "4px",
+          }}
+        >
+          <div className="price">PKR {formatNumberWithCommas(rent)}</div>
+
+          {/* Status Tag - inline with price instead of absolute positioning */}
+          {!showActions && adminStatus && (
+            <div
+              style={{
+                display: "flex",
+                gap: "4px",
+                alignItems: "center",
+                fontSize: "10px",
+                fontWeight: "600",
+                padding: "2px 6px",
+                borderRadius: "8px",
+                background: "#f5f5f5",
+                border: "1px solid #e0e0e0",
+              }}
+            >
+              <span style={{ fontSize: "10px", color: tagClr }}>
+                {statusTagIcon}
+              </span>
+              <span style={{ color: tagClr, textTransform: "uppercase" }}>
+                {statusTag}
+              </span>
+            </div>
+          )}
+        </div>
+
         <div className="type">
           <div className="box" />
           {propertyTypeText}
         </div>
+
         <div className="amenties-section">
           <div className="amenity">
             <div className="icon">
-              <img src="/property/bed.svg" alt="Banner" />
+              <img src="/property/bed.svg" alt="Bedrooms" />
             </div>
             <div className="count">{bedrooms}</div>
           </div>
 
           <div className="amenity">
             <div className="icon">
-              <img src="/property/bath.svg" alt="Banner" />
+              <img src="/property/bath.svg" alt="Bathrooms" />
             </div>
             <div className="count">{bathrooms}</div>
           </div>
 
           <div className="amenity">
             <div className="icon">
-              <img src="/property/area.svg" alt="Banner" />
+              <img src="/property/area.svg" alt="Area" />
             </div>
             <div className="count">{`${areaSizeUnit} ${propertyAreaText}`}</div>
           </div>
         </div>
 
-        <div className="title">{title}</div>
+        <div className="title" title={title}>
+          {title}
+        </div>
         <div className="desc" title={desc}>
           {desc}
         </div>
+
+        {showFeatureButton && !isPremium && (
+          <div
+            style={{ marginTop: "10px" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Button
+              type="primary"
+              block
+              loading={featuring}
+              onClick={handleFeatureProperty}
+            >
+              Pay $5 to Feature
+            </Button>
+          </div>
+        )}
       </div>
     </PropertyCardWrapperStyled>
   );

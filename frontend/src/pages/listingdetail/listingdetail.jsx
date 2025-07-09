@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react"; // ✅ This is crucial
+import React, { useState, useEffect, useCallback } from "react"; // ✅ This is crucial
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import dayjs from "dayjs";
 
-import { useParams } from "react-router-dom"; // Import useParams to get the route parameter
-import { Divider, Modal } from "antd";
+import { useParams, useNavigate } from "react-router-dom"; // Import hooks for routing
+import { Divider, Modal, message } from "antd";
 import { IoBedOutline } from "react-icons/io5";
 import { FaBath } from "react-icons/fa";
 import { IoIosResize, IoIosCall } from "react-icons/io";
@@ -33,6 +33,13 @@ import {
   propertyOptions,
 } from "../addlisting/addlisting.config";
 import { getFeatureIcon } from "./listingdetail.util";
+import {
+  UTILITIES_ITEMS,
+  COMMUNICATION_ITEMS,
+  LANDMARKS_ITEMS,
+  PRIMARY_FEATURES,
+  SECONDARY_FEATURES,
+} from "../addamenitiesmodal/config";
 import { formatNumberWithCommas } from "../../utils/numberformatter";
 import { PageLoader } from "../../components/pageloader";
 
@@ -50,10 +57,10 @@ const customIcon = new L.Icon({
 
 const ListingDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [spinning, setSpinning] = useState(true);
-
+  const [unlocking, setUnlocking] = useState(false);
   const [contactModalVisible, setContactModalVisible] = useState(false);
-
   const [property, setProperty] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -61,62 +68,87 @@ const ListingDetail = () => {
 
   const getCoordinatesFromAddress = async (address, city) => {
     const fullAddress = `${address}, ${city}, Pakistan`;
-    // const fullAddress = `Nust H 12, islamabad, Pakistan`;
-
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
       fullAddress
     )}`;
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (data && data.length > 0) {
-      const { lat, lon } = data[0];
-      return { lat: parseFloat(lat), lng: parseFloat(lon) };
-    } else {
-      console.log("No coordinates found for this address");
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0];
+        return { lat: parseFloat(lat), lng: parseFloat(lon) };
+      }
+    } catch (error) {
+      console.error("Error getting coordinates:", error);
     }
+    return null;
   };
 
-  useEffect(() => {
-    const fetchProperty = async () => {
-      try {
-        const response = await fetch(
-          `${API_URL}/listing/get-listing-detail/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+  const fetchProperty = useCallback(async () => {
+    setSpinning(true);
+    try {
+      const response = await fetch(
+        `${API_URL}/listing/get-listing-detail/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
-        const result = await response.json();
-
-        const property = result.data;
-
-        console.log("Fetched Property Data:", property); // Log the parsed data
-        setProperty(property); // Set only the `data` key to the `property` state
-
-        getCoordinatesFromAddress(property?.adress, property?.city).then(
-          (coords) => {
-            console.log("coords", coords);
-
-            setCords({
-              lat: coords?.lat,
-              lng: coords?.lng,
-            });
-          }
-        );
-      } catch (error) {
-        console.error("Error fetching property details:", error); // Log the error
-      } finally {
-        setSpinning(false);
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
+      const result = await response.json();
+      const propertyData = result.data;
+      setProperty(propertyData);
 
-    fetchProperty();
+      if (propertyData?.adress && propertyData?.city) {
+        const coords = await getCoordinatesFromAddress(
+          propertyData.adress,
+          propertyData.city
+        );
+        if (coords) {
+          setCords({ lat: coords.lat, lng: coords.lng });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching property details:", error);
+      message.error("Failed to load property details.");
+    } finally {
+      setSpinning(false);
+    }
   }, [id]);
+
+  useEffect(() => {
+    fetchProperty();
+  }, [fetchProperty]);
+
+  const handleUnlockWhatsApp = async () => {
+    setUnlocking(true);
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`${API_URL}/listing/unlock-whatsapp/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ featureType: "unlock_whatsapp" }),
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        message.success("Contact unlocked successfully!");
+        await fetchProperty();
+      } else {
+        throw new Error(result.message || "Failed to unlock contact.");
+      }
+    } catch (error) {
+      console.error("Error unlocking WhatsApp:", error);
+      message.error(error.message || "An error occurred.");
+    } finally {
+      setUnlocking(false);
+    }
+  };
 
   const openSlider = (index) => {
     setCurrentSlide(index);
@@ -243,8 +275,35 @@ const ListingDetail = () => {
               <div className="property-name">{property?.title}</div>
 
               <ButtonStyled>
-                <button className="call-button" onClick={handleWhatsApp}>
-                  <WhatsAppOutlined /> WhatsApp
+                {property?.hasPaidForWhatsApp ? (
+                  <button className="call-button" onClick={handleWhatsApp}>
+                    <WhatsAppOutlined /> WhatsApp
+                  </button>
+                ) : (
+                  <button
+                    className="call-button"
+                    onClick={handleUnlockWhatsApp}
+                    disabled={unlocking}
+                  >
+                    {unlocking ? "Unlocking..." : "Pay $2 to Unlock WhatsApp"}
+                  </button>
+                )}
+                <button
+                  className="inquire-button"
+                  onClick={() => navigate(`/payment/${id}`)}
+                  style={{
+                    padding: "0.8rem 1rem",
+                    fontSize: "16px",
+                    fontWeight: 500,
+                    borderRadius: "8px",
+                    background: "#52c41a",
+                    color: "white",
+                    border: "none",
+                    marginLeft: "5px",
+                    width: "150px",
+                  }}
+                >
+                  Proceed to Pay
                 </button>
               </ButtonStyled>
             </div>
@@ -313,18 +372,52 @@ const ListingDetail = () => {
           <FetaureSectionStyled>
             <h2>Features</h2>
             <div className="property-features">
-              {property?.features?.map((feature, index) => {
-                const isCntExists = feature?.count > 0;
-                return (
-                  <div key={`${feature}-${index}`} className="feature-item">
-                    <div className={`icon ${feature?.key?.toLowerCase()}`}>
-                      {getFeatureIcon(feature?.key)}
+              {(() => {
+                // Combine all amenities into one array
+                const ALL_FEATURES = [
+                  ...UTILITIES_ITEMS,
+                  ...COMMUNICATION_ITEMS,
+                  ...LANDMARKS_ITEMS,
+                  ...PRIMARY_FEATURES,
+                  ...SECONDARY_FEATURES,
+                ];
+                // Get selected feature keys
+                const selectedFeatureKeys =
+                  property?.features?.map((f) => f.key) || [];
+                // Map amenity key to count (if any)
+                const featureCountMap = {};
+                property?.features?.forEach((f) => {
+                  if (f.key && f.count) featureCountMap[f.key] = f.count;
+                });
+                return ALL_FEATURES.map((feature, idx) => {
+                  const isSelected = selectedFeatureKeys.includes(feature.key);
+                  const count = featureCountMap[feature.key];
+                  return (
+                    <div
+                      key={feature.key + idx}
+                      className={`feature-item${
+                        isSelected ? "" : " not-selected"
+                      }`}
+                      style={
+                        !isSelected
+                          ? { opacity: 0.5, filter: "grayscale(1)" }
+                          : {}
+                      }
+                    >
+                      <div className={`icon ${feature.key.toLowerCase()}`}>
+                        {getFeatureIcon(feature.key)}
+                      </div>
+                      <span>{feature.label}</span>
+                      {feature.shouldGetCount && isSelected && count
+                        ? `: ${count}`
+                        : ""}
+                      {!isSelected && (
+                        <span style={{ color: "red", marginLeft: 6 }}>❌</span>
+                      )}
                     </div>
-                    {feature?.label}
-                    {isCntExists ? `: ${feature?.count}` : ""}
-                  </div>
-                );
-              })}
+                  );
+                });
+              })()}
             </div>
           </FetaureSectionStyled>
 

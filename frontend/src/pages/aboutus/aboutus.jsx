@@ -16,21 +16,17 @@ const AboutUs = () => {
 
         <AboutUsPageSectionWrapperStyled>
           <SectionStyled>
-            <div className="date">2015</div>
+            <div className="date">2024</div>
             <div className="heading">The Vision</div>
             <div className="desc">
-              The Rent A Space story began with the vision of one man. It was
+              The Rent A Space story began with the vision of our team. It was
               Our dream to transform the real estate sector of Pakistan and
               elevate it to bring it at par with the best international
-              standards. Having spent 15 years in the UK working in the real
-              estate sector, among other achievements Akbar holds to his credit
-              multiple real estate mega projects completed internationally as
-              well as in Pakistan. Akbar moved back to Pakistan in order to give
-              shape to his vision. Thus Rent A Space was created – the
-              next-generation real estate solutions platform for Pakistan. At
-              RentASpace, we aim to provide users with constantly evolving
-              services based on transparency and professionalism that are always
-              a notch above the rest.
+              standards. Thus Rent A Space was created – the next-generation
+              real estate solutions platform for Pakistan. At RentASpace, we aim
+              to provide users with constantly evolving services based on
+              transparency and professionalism that are always a notch above the
+              rest.
             </div>
           </SectionStyled>
 
@@ -40,19 +36,16 @@ const AboutUs = () => {
             <div className="desc">
               The quest to transform Pakistan’s estimated 1.2 trillion USD real
               estate sector is certainly an ambitious one, but Rent A Space
-              doesn’t shy away from challenges. Among the very first people
-              taken aboard by Akbar were Farhan Javed, who joined as Creative
-              Director, and Arslan Javed who joined as Head of Product
-              Development.
+              doesn’t shy away from challenges. 
             </div>
           </SectionStyled>
 
           <SectionStyled>
-            <div className="date">2018</div>
+            <div className="date">2025</div>
             <div className="heading">The Launch</div>
             <div className="desc">
               And so it was 3…2…1…takeoff! Welcome to RentASpace.com: a complete
-              user experience for those seeking to buy, sell, rent or look into
+              user experience for those seeking to  sell, rent or look into
               property development, in just a few clicks. We carefully curate
               and analyse the latest offers and facilitate smooth transactions
               so that you never have to deal with real estate woes again. Now

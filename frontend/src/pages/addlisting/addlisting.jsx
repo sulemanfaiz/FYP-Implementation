@@ -41,8 +41,14 @@ import { addListingSchema } from "./addlistingschema";
 import { useToast } from "../../hooks/useToast";
 import { PageLoader } from "../../components/pageloader";
 import { BorderedButtonStyled, FilledButtonStyled } from "../../app.styles";
+import { Checkbox } from "antd";
+import PaymentModal from "../../components/paymentmodal/PaymentModal";
 
 const AddListingContent = (props) => {
+  const [isPremium, setIsPremium] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [pendingFormValues, setPendingFormValues] = useState(null);
+
   const { showSuccess, showError, showLoading } = useToast(); // ✅ Use methods
   const [spinning, setSpinning] = useState(false);
 
@@ -140,106 +146,120 @@ const AddListingContent = (props) => {
     onFeatureModalClose();
   };
 
-  const onSubmitValues = useCallback(async (values, isDraft, isEdited) => {
-    setSpinning(true);
-    const {
-      propertyType,
-      city,
-      areaSizeUnit,
-      areaSizeMetric,
-      rent,
-      bedrooms,
-      garages,
-      bathrooms,
-      title,
-      desc = "",
-      images,
-      yearBuilt = "",
-      adress,
-      houseNo = "",
-      features = [],
-      isSeasonalDiscount = false,
-      discountStartDate = "",
-      discountEndDate = "",
-      discountPercentage = "",
-      discountLabel = "",
-    } = values || {};
+  const onSubmitValues = useCallback(
+    async (values, isDraft, isEdited, paymentIntentId = null) => {
+      const { isPremium: isPremiumListing } = values;
+      setSpinning(true);
+      const {
+        propertyType,
+        city,
+        areaSizeUnit,
+        areaSizeMetric,
+        rent,
+        bedrooms,
+        garages,
+        bathrooms,
+        title,
+        desc = "",
+        images,
+        yearBuilt = "",
+        adress,
+        houseNo = "",
+        features = [],
+        isSeasonalDiscount = false,
+        discountStartDate = "",
+        discountEndDate = "",
+        discountPercentage = "",
+        discountLabel = "",
+      } = values || {};
 
-    const formData = new FormData();
+      const formData = new FormData();
+      formData.append("isPremium", isPremiumListing ? "true" : "false");
+      if (paymentIntentId) formData.append("paymentIntentId", paymentIntentId);
 
-    images.forEach((file) => {
-      if (file.originFileObj instanceof File) {
-        formData.append("images", file.originFileObj);
-      }
-    });
-
-    const existingImageUrls = images
-      .filter((file) => typeof file === "string" || !file.originFileObj)
-      .map((file) => (typeof file === "string" ? file : file.url)); // depends on your structure
-
-    formData.append("existingImages", JSON.stringify(existingImageUrls));
-    formData.append("propertyType", propertyType);
-    formData.append("city", city);
-    formData.append("areaSizeUnit", areaSizeUnit);
-    formData.append("areaSizeMetric", areaSizeMetric);
-    formData.append("rent", rent);
-    formData.append("bedrooms", bedrooms);
-    formData.append("bathrooms", bathrooms);
-    formData.append("title", title);
-    formData.append("desc", desc);
-    formData.append("garages", garages);
-    formData.append("yearBuilt", yearBuilt);
-    formData.append("adress", adress);
-    formData.append("houseNo", houseNo);
-    formData.append("isDraft", isDraft);
-    formData.append("features", JSON.stringify(features));
-    formData.append("isDiscountEnabled", isSeasonalDiscount);
-    formData.append("discountStartDate", discountStartDate);
-    formData.append("discountEndDate", discountEndDate);
-    formData.append("discountPercentage", discountPercentage);
-    formData.append("discountLabel", discountLabel);
-
-    const token = localStorage.getItem("token");
-
-    const url = isEdited
-      ? `http://localhost:8080/listing/edit-listing/${listingId}`
-      : "http://localhost:8080/listing/add-listing";
-
-    const method = isEdited ? "PUT" : "POST";
-
-    try {
-      const response = await fetch(url, {
-        method: method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
+      images.forEach((file) => {
+        if (file.originFileObj instanceof File) {
+          formData.append("images", file.originFileObj);
+        }
       });
-      const result = await response.json();
 
-      const { success, message, error } = result;
-      if (success) {
-        showSuccess(
-          isEdited
-            ? "Property updated successfully!"
-            : isDraft
-            ? "Draft saved successfully!"
-            : "Property added successfully!"
-        );
-        navigate("/my-properties");
-      } else if (error) {
-        const details = error?.details[0].message;
+      const existingImageUrls = images
+        .filter((file) => typeof file === "string" || !file.originFileObj)
+        .map((file) => (typeof file === "string" ? file : file.url)); // depends on your structure
+
+      formData.append("existingImages", JSON.stringify(existingImageUrls));
+      formData.append("propertyType", propertyType);
+      formData.append("city", city);
+      formData.append("areaSizeUnit", areaSizeUnit);
+      formData.append("areaSizeMetric", areaSizeMetric);
+      formData.append("rent", rent);
+      formData.append("bedrooms", bedrooms);
+      formData.append("bathrooms", bathrooms);
+      formData.append("title", title);
+      formData.append("desc", desc);
+      formData.append("garages", garages);
+      formData.append("yearBuilt", yearBuilt);
+      formData.append("adress", adress);
+      formData.append("houseNo", houseNo);
+      formData.append("isDraft", isDraft);
+      formData.append("features", JSON.stringify(features));
+      formData.append("isDiscountEnabled", isSeasonalDiscount);
+      formData.append("discountStartDate", discountStartDate);
+      formData.append("discountEndDate", discountEndDate);
+      formData.append("discountPercentage", discountPercentage);
+      formData.append("discountLabel", discountLabel);
+
+      const token = localStorage.getItem("token");
+
+      const url = isEdited
+        ? `http://localhost:8080/listing/edit-listing/${listingId}`
+        : "http://localhost:8080/listing/add-listing";
+
+      const method = isEdited ? "PUT" : "POST";
+
+      try {
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+        const result = await response.json();
+
+        const { success, message, error } = result;
+        if (success) {
+          showSuccess(
+            isEdited
+              ? "Property updated successfully!"
+              : isDraft
+              ? "Draft saved successfully!"
+              : "Property added successfully!"
+          );
+          navigate("/my-properties");
+        } else if (error) {
+          const details = error?.details[0].message;
+        }
+      } catch (err) {
+        console.log("catch error", err);
+      } finally {
+        setSpinning(false);
       }
-    } catch (err) {
-      console.log("catch error", err);
-    } finally {
-      setSpinning(false);
-    }
-  }, []);
+    },
+    []
+  );
 
-  const onAdd = useCallback((values) => {
-    onSubmitValues(values, false);
-  }, []);
+  const onAdd = useCallback(
+    (values) => {
+      if (isPremium) {
+        setPendingFormValues({ ...values, isPremium: true });
+        setShowPaymentModal(true);
+      } else {
+        onSubmitValues({ ...values, isPremium: false }, false);
+      }
+    },
+    [isPremium, onSubmitValues]
+  );
 
   const onSaveAsDraft = useCallback((values) => {
     onSubmitValues(values, true);
@@ -268,6 +288,19 @@ const AddListingContent = (props) => {
   };
 
   const isFormValid = errors?.length > 0 ? false : true;
+
+  // Handle payment modal success
+  const handlePaymentSuccess = (paymentIntent) => {
+    setShowPaymentModal(false);
+    if (pendingFormValues) {
+      onSubmitValues(pendingFormValues, false, false, paymentIntent.id);
+      setPendingFormValues(null);
+    }
+  };
+  const handlePaymentCancel = () => {
+    setShowPaymentModal(false);
+    setPendingFormValues(null);
+  };
 
   return (
     <AddListingPageStyled>
@@ -328,12 +361,15 @@ const AddListingContent = (props) => {
                 <Controller
                   control={control}
                   name="houseNo"
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder="Enter House No"
-                      className="input-field"
-                    />
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <Input
+                        {...field}
+                        placeholder="Enter House No"
+                        className="input-field"
+                      />
+                      <div className="error">{error?.message}</div>
+                    </>
                   )}
                 />
               </FormInputWrapperStyled>
@@ -550,6 +586,7 @@ const AddListingContent = (props) => {
                           beforeUpload={() => false} // Prevent auto-upload
                           onChange={handleUpload}
                           showUploadList={false}
+                          accept="image/jpeg,image/png,image/jpg,image/webp"
                         >
                           <BorderedButtonStyled>
                             Click to Upload
@@ -672,6 +709,16 @@ const AddListingContent = (props) => {
                 </>
               )}
 
+              <FormInputWrapperStyled>
+                <Checkbox
+                  checked={isPremium}
+                  onChange={(e) => setIsPremium(e.target.checked)}
+                  style={{ marginBottom: 12 }}
+                >
+                  <b>Become Premium Member for $5 (Featured Listing)</b>
+                </Checkbox>
+              </FormInputWrapperStyled>
+
               <FormButtonWrapperStyled>
                 {["draft", "main"]?.map((type) => {
                   const isDraft = type === "draft";
@@ -713,6 +760,12 @@ const AddListingContent = (props) => {
                   onClose={onFeatureModalClose}
                   onSubmit={onFeaturesSaved}
                   existingAmenities={features}
+                />
+                <PaymentModal
+                  visible={showPaymentModal}
+                  amount={5}
+                  onSuccess={handlePaymentSuccess}
+                  onCancel={handlePaymentCancel}
                 />
               </FormButtonWrapperStyled>
             </AddListingFormStyled>

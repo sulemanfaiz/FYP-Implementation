@@ -63,35 +63,35 @@ const Footer = () => {
         <FooterHeading>Follow Us</FooterHeading>
         <SocialIcons>
           <SocialIcon
-            href="https://instagram.com/graana"
+            href="https://instagram.com/"
             target="_blank"
             rel="noopener noreferrer"
           >
             <FaInstagram />
           </SocialIcon>
           <SocialIcon
-            href="https://linkedin.com/company/graana"
+            href="https://linkedin.com/company/"
             target="_blank"
             rel="noopener noreferrer"
           >
             <FaLinkedin />
           </SocialIcon>
           <SocialIcon
-            href="https://twitter.com/graana"
+            href="https://twitter.com/"
             target="_blank"
             rel="noopener noreferrer"
           >
             <FaTwitter />
           </SocialIcon>
           <SocialIcon
-            href="https://youtube.com/graana"
+            href="https://youtube.com/"
             target="_blank"
             rel="noopener noreferrer"
           >
             <FaYoutube />
           </SocialIcon>
           <SocialIcon
-            href="https://facebook.com/graana"
+            href="https://facebook.com/"
             target="_blank"
             rel="noopener noreferrer"
           >

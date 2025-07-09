@@ -8,8 +8,8 @@ import {
   NoListingFoundStyled,
   PropertiesListingStyled,
 } from "./reviewlistings.styles";
-
 import { useNavigate } from "react-router-dom";
+import { Button } from "antd";
 
 import { useEffect, useState } from "react";
 import PageBanner from "../../components/pagebanner";
@@ -124,6 +124,13 @@ const ReviewListings = (props) => {
 
         <PropertiesListingStyled>
           <PageLoader spinning={spinning} />
+
+          {/* Export Listings Button - styled to match AddPropertyButtonStyled */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 30 }}>
+            <AddPropertyButtonStyled onClick={() => navigate('/admin/export-listings-table')}>
+              Export Listings
+            </AddPropertyButtonStyled>
+          </div>
 
           <StyledTabs items={items} onChange={onChange} />
         </PropertiesListingStyled>

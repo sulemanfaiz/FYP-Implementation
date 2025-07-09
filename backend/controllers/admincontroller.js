@@ -43,11 +43,25 @@ const adminLogin = async (req, res) => {
 const getAllSubmittedListings = async (req, res) => {
   try {
     // Fetch all listings except drafts (assuming "DFT" = Draft)
-    const listings = await ListingModel.find({ userStatus: { $ne: "DFT" } });
+    const listings = await ListingModel.find({ userStatus: { $ne: "DFT" } }).lean();
+
+    // Fetch all userIds from listings
+    const userIds = listings.map(l => l.userId);
+    const users = await UserModel.find({ _id: { $in: userIds } }).lean();
+    const userMap = {};
+    users.forEach(u => { userMap[u._id?.toString()] = u; });
+
+    // Attach owner info to each listing
+    const listingsWithOwner = listings.map(l => ({
+      ...l,
+      ownerName: userMap[l.userId]?.name || "-",
+      ownerEmail: userMap[l.userId]?.email || "-",
+      ownerNumber: userMap[l.userId]?.mobile || "-",
+    }));
 
     res.status(200).json({
       success: true,
-      listings,
+      listings: listingsWithOwner,
     });
   } catch (error) {
     console.error("Admin listing fetch error:", error);

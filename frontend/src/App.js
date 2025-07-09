@@ -1,5 +1,6 @@
 // import "antd/dist/antd.css";
 import "./App.css";
+import "./responsive.css";
 import "leaflet/dist/leaflet.css";
 
 import AddListing from "./pages/addlisting";
@@ -10,6 +11,7 @@ import Login from "./pages/login/login";
 import SignUp from "./pages/signup/signup";
 import MyProperties from "./pages/myproperties";
 import MyProperty from "./pages/myproperty";
+import PaymentPage from "./pages/payment/PaymentPage";
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LandingPage from "./pages/landingpage/landingpage";
@@ -21,7 +23,9 @@ import {
   SearchPage,
   AdminLogin,
   ReviewListings,
+  AuditPage,
 } from "./pages";
+import { AdminExportListings, AdminExportListingsTable } from "./pages/adminexportlistings";
 import Toast from "./components/toast/toast";
 
 function App() {
@@ -45,7 +49,8 @@ function App() {
             />
             <Route path="/listing" element={<Listing />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/listing/:id" element={<ListingDetail />} />
+                        <Route path="/listing/:id" element={<ListingDetail />} />
+            <Route path="/payment/:propertyId" element={<PaymentPage />} />
             <Route path="/my-properties" element={<MyProperties />} />
             <Route path="/admin/review-listings" element={<ReviewListings />} />
             <Route path="/admin/review-listings/:id" element={<MyProperty />} />
@@ -55,6 +60,9 @@ function App() {
             <Route path="/about-us" element={<AboutUs />} />
             <Route path="/smart-rent-ai" element={<SmartPredictionForm />} />
             <Route path="/search/:query" element={<SearchPage />} />
+            <Route path="/admin/export-listings-table" element={<AdminExportListingsTable />} />
+                        <Route path="/admin/export-listings" element={<AdminExportListings />} />
+            <Route path="/admin/audit" element={<AuditPage />} />
           </Routes>
         </div>
       </Toast>

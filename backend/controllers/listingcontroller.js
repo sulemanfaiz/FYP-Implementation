@@ -4,6 +4,7 @@ const LikedListingModel = require("../models/likedlisting");
 const UserModel = require("../models/user");
 const sendEmail = require("../utils/Sendemail");
 const mongoose = require("mongoose");
+const PaymentModel = require("../models/payment");
 
 const addListing = async (req, res) => {
   try {
@@ -53,6 +54,7 @@ const addListing = async (req, res) => {
       discountEndDate: req.body.discountEndDate,
       discountPercentage: req.body.discountPercentage,
       discountLabel: req.body.discountLabel,
+      isPremium: req.body.isPremium === 'true',
     };
 
     const listing = new ListingModel(listingData);
@@ -191,7 +193,8 @@ const getListing = async (req, res) => {
 
 const getAllListings = async (req, res) => {
   try {
-    const listings = await ListingModel.find({ adminStatus: "APR" });
+    // Only find listings that are not rented
+    const listings = await ListingModel.find({ isRented: { $ne: true }, adminStatus: "APR" });
 
     let likedListingIds = [];
 
@@ -225,35 +228,102 @@ const getAllListings = async (req, res) => {
   }
 };
 
-const getListingDetail = async (req, res) => {
+const unlockWhatsApp = async (req, res) => {
   try {
-    const listingId = req.params.id; // Keep your variable declaration
-    const listing = await ListingModel.findById(listingId).populate("userId");
+    const { id } = req.params;
+    const userId = req.user._id;
 
-    const owner = await UserModel.findById({ _id: listing?.userId });
-
-    if (!listing) {
-      return res.status(404).json({
-        message: "Listing not found",
-        success: false,
-      });
+    // Check if a payment record already exists for this specific feature
+    const existingPayment = await PaymentModel.findOne({ userId, listingId: id, featureType: "unlock_whatsapp" });
+    if (existingPayment) {
+      return res.status(400).json({ success: false, message: "Payment already made" });
     }
 
-    const rest = listing.toObject();
+    const payment = new PaymentModel({
+      featureType: "unlock_whatsapp",
+      userId,
+      listingId: id,
+      amount: 2, // Set the amount to $2
+      currency: "USD",
+      status: "succeeded",
+    });
+
+    await payment.save();
+
+    res.status(201).json({ success: true, message: "WhatsApp feature unlocked successfully" });
+  } catch (error) {
+    console.error("Error unlocking WhatsApp feature:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+const getListingDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`
+--- Debugging Access for Listing: ${id} ---`);
+
+    const listing = await ListingModel.findById(id);
+    if (!listing) {
+      console.log('[DEBUG] Listing not found in database.');
+      return res.status(404).json({ message: "Listing not found", success: false });
+    }
+
+    if (!listing.userId) {
+      return res.status(500).json({ success: false, message: 'Property data is corrupted; owner is missing.' });
+    }
+    const owner = await UserModel.findById(listing.userId);
+    const responseData = {
+      ...listing.toObject(),
+      ownerName: owner?.name,
+      ownerEmail: owner?.email,
+    };
+
+    const loggedInUserId = req?.user?._id;
+    console.log(`[DEBUG] Listing Owner ID: ${listing.userId?.toString()}`);
+    console.log(`[DEBUG] Logged-in User ID: ${loggedInUserId?.toString()}`);
+
+    let hasPaid = false;
+    let isOwner = false;
+
+    if (loggedInUserId) {
+      if (listing.userId && listing.userId.toString() === loggedInUserId.toString()) {
+        isOwner = true;
+      }
+      console.log(`[DEBUG] Is user the owner? ${isOwner}`);
+
+      const payment = await PaymentModel.findOne({
+        userId: loggedInUserId,
+        listingId: id,
+        featureType: "unlock_whatsapp",
+      });
+
+      if (payment) {
+        hasPaid = true;
+      }
+      console.log(`[DEBUG] Has user paid? ${hasPaid} (Payment record: ${payment ? 'Found' : 'Not Found'})`);
+
+    } else {
+      console.log('[DEBUG] No user is logged in for this request.');
+    }
+
+    if (isOwner || hasPaid) {
+      console.log('[DEBUG] Access GRANTED. Adding phone number to response.');
+      responseData.ownerPhone = owner?.phone;
+    }
+
+    responseData.hasPaidForWhatsApp = isOwner || hasPaid;
+    console.log(`[DEBUG] Final 'hasPaidForWhatsApp' flag: ${responseData.hasPaidForWhatsApp}`);
+    console.log('--- End of Debug ---');
 
     res.status(200).json({
-      message: "Listing fetched successfully",
       success: true,
-      data: {
-        ...rest,
-        ownerPhone: owner?.mobile,
-        ownerName: owner?.name,
-        ownerEmail: owner?.email,
-      },
+      data: responseData,
     });
+
   } catch (error) {
-    console.error("Error fetching user listings:", error);
-    return res.status(500).json({
+    console.error("Error fetching listing details:", error);
+    res.status(500).json({
       success: false,
       message: "Internal server error",
     });
@@ -320,8 +390,8 @@ const searchListings = async (req, res) => {
       ];
     });
 
-    // Find listings where any word matches any of the fields
-    const listings = await ListingModel.find({ $or: orConditions });
+    // Find listings where any word matches any of the fields, and the property is not rented
+    const listings = await ListingModel.find({ $and: [{ $or: orConditions }, { isRented: { $ne: true } }] });
 
     res.status(200).json({ success: true, listings });
   } catch (error) {
@@ -342,7 +412,10 @@ const detailedFilterListings = async (req, res) => {
       plotSizeUnit,
     } = req.query;
 
-    const filter = {};
+    const filter = {
+      adminStatus: "APR",
+      isRented: { $ne: true }, // Exclude rented properties
+    };
 
     if (q) {
       const words = q.split(" ").filter((word) => word.trim() !== "");
@@ -390,6 +463,45 @@ const detailedFilterListings = async (req, res) => {
   }
 };
 
+const featureProperty = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    // 1. Check if the listing exists and belongs to the user
+    const listing = await ListingModel.findOne({ _id: id, userId });
+    if (!listing) {
+      return res.status(404).json({ success: false, message: "Listing not found or you're not the owner." });
+    }
+
+    // 2. Check if the property is already featured to prevent duplicate payments
+    if (listing.isPremium) {
+      return res.status(400).json({ success: false, message: "This property is already featured." });
+    }
+
+    // 3. Create the payment record
+    const payment = new PaymentModel({
+      featureType: "feature_property",
+      userId,
+      listingId: id,
+      amount: 5, // $5 to feature
+      currency: "USD",
+      status: "succeeded",
+    });
+    await payment.save();
+
+    // 4. Update the listing to mark it as premium
+    listing.isPremium = true;
+    await listing.save();
+
+    res.status(200).json({ success: true, message: "Property featured successfully!" });
+
+  } catch (error) {
+    console.error("Error featuring property:", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+};
+
 module.exports = {
   addListing,
   editListing,
@@ -399,4 +511,6 @@ module.exports = {
   markListingAsInactive,
   searchListings,
   detailedFilterListings,
+  unlockWhatsApp,
+  featureProperty,
 };

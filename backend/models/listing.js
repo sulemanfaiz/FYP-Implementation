@@ -43,7 +43,10 @@ const ListingSchema = new Schema({
   discountEndDate: { type: String },
   discountPercentage: { type: String },
   discountLabel: { type: String },
+  isPremium: { type: Boolean, default: false },
+  isRented: { type: Boolean, default: false },
 });
 
 const ListingModel = mongoose.model("listings", ListingSchema);
+mongoose.model("Listing", ListingSchema); // Register as 'Listing' for population compatibility
 module.exports = ListingModel;

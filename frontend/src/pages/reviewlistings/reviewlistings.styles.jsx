@@ -58,7 +58,7 @@ export const AddPropertyButtonStyled = styled(Button)`
 export const ListingsStyled = styled.div`
   display: flex;
   /* flex-direction: column; */
-  gap: 15px;
+ gap: 5px;
   flex-wrap: wrap;
 
   /* @media ${devices.tablet} {

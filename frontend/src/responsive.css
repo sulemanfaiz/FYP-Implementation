@@ -1,0 +1,456 @@
+/* Responsive Design System - Global Responsive Styles */
+/* This file contains responsive breakpoints and utilities that work alongside existing styles */
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+/* Mobile First Approach */
+
+/* Extra Small devices (phones, 576px and down) */
+@media (max-width: 575.98px) {
+  /* Global container adjustments */
+  .container,
+  .app-container {
+    padding: 0 10px;
+    margin: 0 auto;
+  }
+
+  /* Typography adjustments */
+  h1 {
+    font-size: 1.5rem !important;
+  }
+  h2 {
+    font-size: 1.25rem !important;
+  }
+  h3 {
+    font-size: 1.1rem !important;
+  }
+  h4 {
+    font-size: 1rem !important;
+  }
+  h5 {
+    font-size: 0.9rem !important;
+  }
+  h6 {
+    font-size: 0.8rem !important;
+  }
+
+  /* Button adjustments */
+  .ant-btn {
+    font-size: 0.875rem !important;
+    padding: 4px 8px !important;
+  }
+
+  /* Form adjustments */
+  .ant-form-item {
+    margin-bottom: 12px !important;
+  }
+
+  .ant-input,
+  .ant-select {
+    font-size: 0.875rem !important;
+  }
+
+  /* Card adjustments */
+  .ant-card {
+    margin-bottom: 12px !important;
+  }
+
+  .ant-card-body {
+    padding: 12px !important;
+  }
+
+  /* Grid adjustments */
+  .ant-row {
+    margin: 0 -5px !important;
+  }
+
+  .ant-col {
+    padding: 0 5px !important;
+  }
+
+  /* Navigation adjustments */
+  .ant-menu {
+    font-size: 0.875rem !important;
+  }
+
+  /* Modal adjustments */
+  .ant-modal {
+    margin: 10px !important;
+    max-width: calc(100vw - 20px) !important;
+  }
+
+  .ant-modal-content {
+    padding: 16px !important;
+  }
+
+  /* Table adjustments */
+  .ant-table {
+    font-size: 0.75rem !important;
+  }
+
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px !important;
+  }
+
+  /* Image gallery adjustments */
+  .image-gallery {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* Property card adjustments */
+  .property-card {
+    margin-bottom: 12px !important;
+  }
+
+  /* Header adjustments */
+  .header-container {
+    padding: 8px 10px !important;
+  }
+
+  .header-logo {
+    font-size: 1.2rem !important;
+  }
+
+  /* Footer adjustments */
+  .footer-container {
+    padding: 20px 10px !important;
+  }
+
+  /* Sidebar adjustments */
+  .sidebar {
+    width: 100% !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 1000 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s ease !important;
+  }
+
+  .sidebar.open {
+    transform: translateX(0) !important;
+  }
+
+  /* Main content adjustments */
+  .main-content {
+    margin-left: 0 !important;
+    padding: 10px !important;
+  }
+
+  /* Search bar adjustments */
+  .search-container {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .search-input {
+    width: 100% !important;
+  }
+
+  /* Filter adjustments */
+  .filter-container {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .filter-item {
+    width: 100% !important;
+  }
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .container,
+  .app-container {
+    padding: 0 15px;
+  }
+
+  h1 {
+    font-size: 1.75rem !important;
+  }
+  h2 {
+    font-size: 1.5rem !important;
+  }
+  h3 {
+    font-size: 1.25rem !important;
+  }
+
+  .image-gallery {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .search-container {
+    flex-direction: row !important;
+    gap: 10px !important;
+  }
+
+  .filter-container {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .container,
+  .app-container {
+    padding: 0 20px;
+  }
+
+  h1 {
+    font-size: 2rem !important;
+  }
+  h2 {
+    font-size: 1.75rem !important;
+  }
+  h3 {
+    font-size: 1.5rem !important;
+  }
+
+  .image-gallery {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .sidebar {
+    width: 250px !important;
+  }
+
+  .main-content {
+    margin-left: 250px !important;
+  }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .container,
+  .app-container {
+    padding: 0 25px;
+  }
+
+  .image-gallery {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 15px !important;
+  }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .container,
+  .app-container {
+    padding: 0 30px;
+    max-width: 1200px;
+  }
+
+  .image-gallery {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 18px !important;
+  }
+}
+
+/* ===== RESPONSIVE UTILITY CLASSES ===== */
+
+/* Hide/Show elements based on screen size */
+.hidden-xs {
+  display: none !important;
+}
+.hidden-sm {
+  display: none !important;
+}
+.hidden-md {
+  display: none !important;
+}
+.hidden-lg {
+  display: none !important;
+}
+.hidden-xl {
+  display: none !important;
+}
+
+.visible-xs {
+  display: block !important;
+}
+.visible-sm {
+  display: block !important;
+}
+.visible-md {
+  display: block !important;
+}
+.visible-lg {
+  display: block !important;
+}
+.visible-xl {
+  display: block !important;
+}
+
+@media (max-width: 575.98px) {
+  .hidden-xs {
+    display: block !important;
+  }
+  .visible-xs {
+    display: none !important;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .hidden-sm {
+    display: block !important;
+  }
+  .visible-sm {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .hidden-md {
+    display: block !important;
+  }
+  .visible-md {
+    display: none !important;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .hidden-lg {
+    display: block !important;
+  }
+  .visible-lg {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .hidden-xl {
+    display: block !important;
+  }
+  .visible-xl {
+    display: none !important;
+  }
+}
+
+/* ===== FLEXIBLE GRID SYSTEM ===== */
+.responsive-grid {
+  display: grid;
+  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+@media (max-width: 575.98px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+/* ===== RESPONSIVE SPACING ===== */
+.responsive-padding {
+  padding: 20px;
+}
+
+.responsive-margin {
+  margin: 20px;
+}
+
+@media (max-width: 575.98px) {
+  .responsive-padding {
+    padding: 10px !important;
+  }
+  .responsive-margin {
+    margin: 10px !important;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .responsive-padding {
+    padding: 15px !important;
+  }
+  .responsive-margin {
+    margin: 15px !important;
+  }
+}
+
+/* ===== TOUCH-FRIENDLY ELEMENTS ===== */
+@media (max-width: 767.98px) {
+  /* Increase touch targets */
+  .ant-btn {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+
+  .ant-menu-item {
+    min-height: 44px !important;
+    line-height: 44px !important;
+  }
+
+  .ant-input,
+  .ant-select {
+    min-height: 44px !important;
+  }
+
+  /* Improve scrolling */
+  .scrollable-content {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  body {
+    font-size: 12pt !important;
+    line-height: 1.4 !important;
+  }
+
+  .ant-card {
+    break-inside: avoid !important;
+    margin-bottom: 20px !important;
+  }
+}
+
+/* ===== ACCESSIBILITY IMPROVEMENTS ===== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .ant-btn {
+    border-width: 2px !important;
+  }
+
+  .ant-input,
+  .ant-select {
+    border-width: 2px !important;
+  }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+@media (prefers-color-scheme: dark) {
+  /* This can be customized based on your dark mode implementation */
+  .auto-dark-mode {
+    background-color: #1f1f1f !important;
+    color: #ffffff !important;
+  }
+}

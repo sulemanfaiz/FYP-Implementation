@@ -53,8 +53,8 @@ export const ActionButtonStyled = styled.button`
   color: #666;
 
   &:hover {
-    border-color: #1890ff;
-    color: #1890ff;
+    border-color: #e85451;
+    color: #e85451;
     background: #f0f8ff;
   }
 
@@ -70,31 +70,76 @@ export const CardContentStyled = styled.div`
 
 export const ImageGalleryStyled = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
   margin-bottom: 20px;
   border-radius: 8px;
   overflow: hidden;
+  padding: 16px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    padding: 12px;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    padding: 8px;
+  }
 `;
 
-export const PropertyImageStyled = styled.div`
-  height: 120px;
-  background: ${(props) => (props.src ? `url(${props.src})` : "#f5f5f5")};
-  background-size: cover;
-  background-position: center;
+export const PropertyImageStyled = styled.img`
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
   border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 768px) {
+    height: 120px;
+  }
+
+  @media (max-width: 480px) {
+    height: 100px;
+  }
+`;
+
+export const MoreImagesStyled = styled.div`
+  width: 100%;
+  height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
+  background: linear-gradient(135deg, #e85451 0%, #f29d7e(158, 75, 162) 100%);
+  color: white;
+  font-weight: 600;
   font-size: 14px;
-  font-weight: 500;
+  text-align: center;
+  border-radius: 8px;
   border: 1px solid #f0f0f0;
+  transition: transform 0.3s ease;
 
-  &.more-images {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    font-weight: 600;
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 768px) {
+    height: 120px;
+    font-size: 13px;
+  }
+
+  @media (max-width: 480px) {
+    height: 100px;
+    font-size: 12px;
   }
 `;
 
@@ -119,7 +164,7 @@ export const InfoSectionStyled = styled.div`
       margin: 0 0 12px 0;
 
       .anticon {
-        color: #1890ff;
+        color: #f29d7e;
       }
     }
   }
@@ -134,7 +179,7 @@ export const PriceDisplayStyled = styled.div`
   .price {
     font-size: 24px;
     font-weight: 700;
-    color: #1890ff;
+    color: #f29d7e;
   }
 
   .period {
@@ -179,7 +224,7 @@ export const InfoItemStyled = styled.div`
   .anticon,
   .icon {
     font-size: 18px;
-    color: #1890ff;
+    color: #f29d7e;
     min-width: 20px;
   }
 
@@ -218,7 +263,7 @@ export const SectionTitleStyled = styled.h4`
   gap: 8px;
 
   .anticon {
-    color: #1890ff;
+    color: #f29d7e;
   }
 `;
 
@@ -227,7 +272,7 @@ export const DescriptionStyled = styled.div`
   padding: 16px;
   background: #fafafa;
   border-radius: 8px;
-  border-left: 4px solid #1890ff;
+  border-left: 4px solid #f29d7e;
 
   p {
     margin: 0;
@@ -240,26 +285,48 @@ export const DescriptionStyled = styled.div`
 export const FeaturesGridStyled = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 20px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+
+  @media (max-width: 768px) {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  @media (max-width: 480px) {
+    gap: 6px;
+    padding: 8px;
+  }
 `;
 
 export const FeatureTagStyled = styled.span`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #f29d7e 0%, #e85451 100%);
   color: white;
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-size: 12px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba (102, 126, 234, 0.3);
+  }
 
   .count {
     background: rgba(255, 255, 255, 0.2);
     padding: 2px 6px;
     border-radius: 10px;
-    font-size: 10px;
+    font-size: 11px;
+    font-weight: 600;
   }
 `;
 
@@ -280,7 +347,7 @@ export const OwnerInfoStyled = styled.div`
     border: 1px solid #e9ecef;
 
     .anticon {
-      color: #1890ff;
+      color: #e85451;
       font-size: 16px;
     }
 

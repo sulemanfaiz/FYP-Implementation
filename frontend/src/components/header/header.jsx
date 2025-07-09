@@ -50,6 +50,11 @@ const Header = () => {
           <NavItem onClick={() => navigate("/smart-rent-ai")}>
             SmartRent AI
           </NavItem>
+          {isLoggedInUserIsAdmin && (
+            <NavItem onClick={() => navigate("/admin/audit")}>
+              Transaction Audit
+            </NavItem>
+          )}
         </NavLinks>
 
         {/* Mobile Menu Button */}
@@ -104,6 +109,16 @@ const Header = () => {
           >
             SmartRent AI
           </NavItem>
+          {isLoggedInUserIsAdmin && (
+            <NavItem
+              onClick={() => {
+                navigate("/admin/audit");
+                setMobileMenuOpen(false);
+              }}
+            >
+              Transaction Audit
+            </NavItem>
+          )}
           {!isLoggedIn && (
             <NavItem
               onClick={() => {

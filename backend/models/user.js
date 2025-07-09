@@ -19,7 +19,13 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
 });
 
 const UserModel = mongoose.model("users", UserSchema);
+mongoose.model("User", UserSchema); // Register as 'User' for population compatibility
 module.exports = UserModel;

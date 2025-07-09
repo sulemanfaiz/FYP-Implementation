@@ -13,6 +13,8 @@ const AdminRouter = require("./routes/adminroute");
 const ListingRouter = require("./routes/listingroute");
 const LikedListingRouter = require("./routes/likedlistingroute");
 const PredictionRouter = require("./routes/predictionRoutes"); // adjust path & filename if needed
+const StripeRouter = require("./stripe");
+const TransactionRouter = require("./routes/transaction.route.js");
 
 require("dotenv").config();
 require("./models/db");
@@ -35,6 +37,17 @@ app.use("/admin", AdminRouter);
 app.use("/listing", ListingRouter);
 app.use("/likedlisting", LikedListingRouter);
 app.use("/api/predictions", PredictionRouter);
+app.use("/stripe", StripeRouter);
+app.use("/api/transactions", TransactionRouter);
+
+// Debug route to test if server is working
+app.get("/api/test", (req, res) => {
+  res.json({
+    message: "Server is working",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`);
 });

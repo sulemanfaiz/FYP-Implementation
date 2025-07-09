@@ -11,6 +11,7 @@ import {
   CardContentStyled,
   ImageGalleryStyled,
   PropertyImageStyled,
+  MoreImagesStyled,
   InfoSectionStyled,
   InfoGridStyled,
   InfoItemStyled,
@@ -23,7 +24,7 @@ import {
   DiscountBadgeStyled,
   MoreActionsStyled,
   ActionItemStyled,
-} from "./reviewpropertycard.styles";
+} from "./reviewpropertycard.styles.jsx";
 
 import { Button, Popover, Tag, Tooltip, Divider } from "antd";
 import { useState } from "react";
@@ -47,6 +48,7 @@ import {
   MailOutlined,
   CalendarOutlined,
   StarOutlined,
+  PictureOutlined,
 } from "@ant-design/icons";
 
 const MoreActions = (props) => {
@@ -141,7 +143,6 @@ const ReviewPropertyCard = (props) => {
   } = listing || {};
 
   const imgExists = fileNames?.length > 0;
-  const path = fileNames?.[0];
 
   const propertyTypeText =
     propertyOptions?.find((property) => property.value === propertyType)
@@ -218,24 +219,6 @@ const ReviewPropertyCard = (props) => {
       </CardHeaderStyled>
 
       <CardContentStyled onClick={propsOnClick}>
-        {/* Property Images */}
-        {imgExists && (
-          <ImageGalleryStyled>
-            {fileNames?.slice(0, 3).map((path, index) => (
-              <PropertyImageStyled
-                key={`${path}-${index}`}
-                src={`${API_URL}/uploads/${path}`}
-                alt={`Property ${index + 1}`}
-              />
-            ))}
-            {fileNames?.length > 3 && (
-              <PropertyImageStyled className="more-images">
-                +{fileNames.length - 3} more
-              </PropertyImageStyled>
-            )}
-          </ImageGalleryStyled>
-        )}
-
         {/* Property Information */}
         <InfoSectionStyled>
           <div className="main-info">
@@ -336,7 +319,9 @@ const ReviewPropertyCard = (props) => {
             </div>
           )}
 
-          <Divider />
+          {/* Property Images */}
+
+          <Divider style={{ margin: "24px 0" }} />
 
           {/* Owner Information */}
           <OwnerInfoStyled>
@@ -358,6 +343,32 @@ const ReviewPropertyCard = (props) => {
               </div>
             </div>
           </OwnerInfoStyled>
+          <Divider style={{ margin: "24px 0" }} />
+          {imgExists && (
+            <div className="images-section">
+              <SectionTitleStyled>
+                <PictureOutlined /> Property Images
+              </SectionTitleStyled>
+              <ImageGalleryStyled>
+                {fileNames?.slice(0, 4).map((filename, index) => (
+                  <PropertyImageStyled
+                    key={`${filename}-${index}`}
+                    src={`${API_URL}/uploads/${filename}`}
+                    alt={`Property ${index + 1}`}
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                    }}
+                  />
+                ))}
+                {fileNames?.length > 4 && (
+                  <MoreImagesStyled>
+                    +{fileNames.length - 4} more
+                  </MoreImagesStyled>
+                )}
+              </ImageGalleryStyled>
+            </div>
+          )}
+          <Divider style={{ margin: "24px 0" }} />
         </InfoSectionStyled>
       </CardContentStyled>
     </ReviewPropertyCardWrapperStyled>

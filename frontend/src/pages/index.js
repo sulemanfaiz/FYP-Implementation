@@ -6,6 +6,7 @@ import PredictionCard from "./predictioncard";
 import SearchPage from "./searchpage";
 import AdminLogin from "./adminlogin";
 import ReviewListings from "./reviewlistings";
+import AuditPage from "./admin/AuditPage";
 
 export {
   Home,
@@ -16,4 +17,5 @@ export {
   SearchPage,
   AdminLogin,
   ReviewListings,
+  AuditPage,
 };

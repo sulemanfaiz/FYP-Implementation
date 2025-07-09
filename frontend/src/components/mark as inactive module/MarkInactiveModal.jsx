@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Radio } from "antd";
 import { Modal } from "antd";
+import { message } from "antd";
 import {
   ModalTitleStyled,
   ModalBodyStyled,
@@ -18,7 +19,7 @@ const MarkInactiveModal = ({ visible, onClose, onSubmit }) => {
 
   const handleSubmit = () => {
     if (!reason) {
-      alert("Please select a reason before submitting.");
+      message.error("Please select a reason before submitting.");
       return;
     }
     onSubmit({ reason, additionalDetails });

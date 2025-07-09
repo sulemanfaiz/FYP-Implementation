@@ -70,31 +70,48 @@ export const CardContentStyled = styled.div`
 
 export const ImageGalleryStyled = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 8px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
   border-radius: 8px;
-  overflow: hidden;
 `;
 
-export const PropertyImageStyled = styled.div`
-  height: 120px;
-  background: ${(props) => (props.src ? `url(${props.src})` : "#f5f5f5")};
-  background-size: cover;
-  background-position: center;
+export const PropertyImageStyled = styled.img`
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
   border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #666;
-  font-size: 14px;
-  font-weight: 500;
   border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
 
   &.more-images {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    text-align: center;
+    object-fit: unset;
+  }
+
+  /* Fallback for broken images */
+  &[alt]:after {
+    content: attr(alt);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #666;
+    font-size: 12px;
+    text-align: center;
   }
 `;
 
@@ -122,6 +139,10 @@ export const InfoSectionStyled = styled.div`
         color: #ee5a24;
       }
     }
+  }
+
+  .images-section {
+    margin-top: 20px;
   }
 `;
 

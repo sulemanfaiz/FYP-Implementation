@@ -11,7 +11,7 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import PageBanner from "../../components/pagebanner";
 import Header from "../../components/header/header";
 import { Footer } from "../../components";
@@ -19,7 +19,7 @@ import { NoDataFound } from "../../components/nodatafound";
 import { PageLoader } from "../../components/pageloader";
 
 const PropertyListing = (props) => {
-  const { listings } = props || {};
+  const { listings, onFeatureSuccess } = props || {};
   const navigate = useNavigate();
 
   const onPropertyClick = (propertyId) => {
@@ -41,6 +41,8 @@ const PropertyListing = (props) => {
             propsOnClick={() => onPropertyClick(listing?._id)}
             showActions={false}
             key={listing?._id}
+            showFeatureButton={true}
+            onFeatureSuccess={onFeatureSuccess}
           />
         ))
       )}
@@ -50,23 +52,53 @@ const PropertyListing = (props) => {
 
 const MyPoperties = (props) => {
   const [spinning, setSpinning] = useState(true);
-
   const { isLikedPropertiesListing } = props;
   const [tab, setTab] = useState("1");
   const [listings, setListings] = useState([]);
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
+  const getUserListings = useCallback(async () => {
+    setSpinning(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/listing/get-user-listings`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const result = await response.json();
+      if (result.success) {
+        setListings(result.listings || []);
+      } else {
+        console.error("Failed to fetch listings:", result.message);
+      }
+    } catch (err) {
+      console.error("Error fetching listings:", err);
+    } finally {
+      setSpinning(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    getUserListings();
+  }, [getUserListings]);
 
   const onChange = (key) => {
     setTab(key);
   };
 
   const statusFilters = {
-    1: () => listings, // All Listings
-    2: () => listings?.filter((l) => l?.adminStatus === "APR"),
+    1: () => listings,
+    2: () => listings?.filter((l) => l?.adminStatus === "APR" && !l?.isRented),
     3: () => listings?.filter((l) => l?.adminStatus === "PEN"),
     4: () => listings?.filter((l) => l?.adminStatus === "REJ"),
     5: () => listings?.filter((l) => l?.userStatus === "DFT"),
     6: () => listings?.filter((l) => l?.userStatus === "INA"),
+    7: () => listings?.filter((l) => l?.isRented),
   };
 
   const items = [
@@ -76,43 +108,16 @@ const MyPoperties = (props) => {
     { key: "4", label: "Rejected Listings" },
     { key: "5", label: "Draft Listings" },
     { key: "6", label: "In-Active Listings" },
+    { key: "7", label: "Sold Out" },
   ]?.map((item) => ({
     ...item,
-    children: <PropertyListing listings={statusFilters[item?.key]?.() || []} />,
+    children: (
+      <PropertyListing
+        listings={statusFilters[item?.key]?.() || []}
+        onFeatureSuccess={getUserListings}
+      />
+    ),
   }));
-
-  const token = localStorage.getItem("token");
-
-  const getUserListings = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:8080/listing/get-user-listings`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`, // ✅ Important
-          },
-        }
-      );
-      const result = await response.json();
-      const { success, message, error } = result;
-      if (success) {
-        const listings = result.listings || [];
-        console.log("listings", listings);
-        setListings(listings);
-      } else if (error) {
-        const details = error?.details[0].message;
-      }
-    } catch (err) {
-      console.log("catch error", err);
-    } finally {
-      setSpinning(false);
-    }
-  };
-
-  useEffect(() => {
-    getUserListings();
-  }, []);
 
   return (
     <MyPopertiesPageStyled>
